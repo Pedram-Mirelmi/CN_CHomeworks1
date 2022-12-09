@@ -40,16 +40,12 @@ public:
                                           std::placeholders::_1,
                                           std::placeholders::_2)
                                 );
-//        char* buffer = new char[1000];
-//        socket.async_read_some(asio::buffer(buffer, 1000), [&](std::error_code ec, size_t length){
-//           std::cout << "read some" << std::endl;
-//        });
         if(!ec)
         {
             std::cout << "New Connection accepted" << std::endl;
             shared_ptr<Session<MsgType>> newConnection = make_shared<Session<MsgType>>(std::move(socket));
             asio::async_read(newConnection->getSocket(),
-                             asio::buffer(newConnection->getHeaderInBuffer(), NetMessageHeader<MsgType>().calculateNeededSizeForThis()),
+                             asio::buffer(newConnection->getHeaderInBuffer(), NetMessageHeader<MsgType>::getHeaderSize()),
                              std::bind(&BasicNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
@@ -94,7 +90,7 @@ public:
             auto netMessage = m_bodyDeserializer->deserializeBody(session->getTempHeader(), session->getBodyInBuffer());
             m_messageProcessor->processNetMessage(netMessage, session);
             asio::async_read(session->getSocket(),
-                             asio::buffer(session->getHeaderInBuffer(), sizeof (NetMessageHeader<MsgType>)),
+                             asio::buffer(session->getHeaderInBuffer(), NetMessageHeader<MsgType>::getHeaderSize()),
                              std::bind(&BasicNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
