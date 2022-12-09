@@ -1,5 +1,5 @@
 #pragma once
-#include "./io/NetMessage.h"
+#include "./io/BasicNetMessage.h"
 #include "./Session.h"
 
 template<typename MsgType>

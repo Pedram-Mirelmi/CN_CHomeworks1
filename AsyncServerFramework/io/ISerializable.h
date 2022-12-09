@@ -11,5 +11,5 @@ public:
 
     virtual void serialize(char* buffer) const = 0;
 
-    virtual size_t calculateNeededSizeForThis() const = 0;
+    virtual uint32_t calculateNeededSizeForThis() const = 0;
 };
