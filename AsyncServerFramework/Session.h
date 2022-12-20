@@ -3,7 +3,7 @@
 #include <iostream>
 #include <mutex>
 
-#include <io/BasicNetMessage.h>
+#include "./io/BasicNetMessage.h"
 
 using std::string;
 
