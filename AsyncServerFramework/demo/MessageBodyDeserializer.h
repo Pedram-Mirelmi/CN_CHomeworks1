@@ -1,9 +1,10 @@
 #pragma once
+#include <exception>
 #include "../io/INetMessageBodyDeserializer.h"
 #include "./NetMessages.h"
 using std::make_shared;
 
-class MessageBodyDeserializer : INetMessageBodyDeserializer<DemoNetMessageType>
+class MessageBodyDeserializer : public INetMessageBodyDeserializer<DemoNetMessageType>
 {
 public:
 
@@ -16,6 +17,8 @@ public:
             case DemoNetMessageType::TEXT_MESSAGE:
                 return shared_ptr<NetMessage<DemoNetMessageType>>(new SimpleTextMessage(std::string(bodyBuffer, header.getBodySize())));
 
+            default:
+                throw std::runtime_error("Unknown type of net message");
         }
     }
 };

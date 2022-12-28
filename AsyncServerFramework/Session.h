@@ -3,7 +3,7 @@
 #include <iostream>
 #include <mutex>
 
-#include <io/BasicNetMessage.h>
+#include "io/BasicNetMessage.h"
 
 using std::string;
 
@@ -26,6 +26,12 @@ public:
 
     Session(const Session& other) = delete;
     Session& operator=(const Session& other) = delete;
+
+    ~Session()
+    {
+        // TODO log that the session is closing
+        m_socket.close();
+    }
 
     virtual void deserializeHeader()
     {

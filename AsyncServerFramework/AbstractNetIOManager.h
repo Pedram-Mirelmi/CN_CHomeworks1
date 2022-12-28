@@ -1,7 +1,6 @@
 #pragma once
 
 #include "./IService.h"
-#include "./INetMessageProcessor.h"
 #include "./io/BasicNetMessage.h"
 #include "./INetWriter.h"
 #include "./io/INetMessageBodyDeserializer.h"
@@ -11,7 +10,7 @@ using std::make_shared;
 
 
 template<typename MsgType>
-class BasicNetIOManager : public IService, public INetWriter<MsgType>, public std::enable_shared_from_this<BasicNetIOManager<MsgType>>
+class AbstractNetIOManager : public IService, public INetWriter<MsgType>, public std::enable_shared_from_this<AbstractNetIOManager<MsgType>>
 {
     using socket = asio::ip::tcp::socket;
 protected:
@@ -20,33 +19,35 @@ protected:
 
     asio::ip::tcp::acceptor m_acceptor;
 
-    shared_ptr<INetMessageProcessor<MsgType>> m_messageProcessor;
-    shared_ptr<INetMessageBodyDeserializer<MsgType>> m_bodyDeserializer;
 public:
-    BasicNetIOManager(const string& ip, const uint16_t port, const int& ioThreadsCount)
-        : IService(), INetWriter<MsgType>(), m_acceptor(m_ioContext, asio::ip::tcp::endpoint(asio::ip::make_address(ip), port))
+    AbstractNetIOManager(const string& ip, const uint16_t port, const int& ioThreadsCount)
+        : IService(),
+          INetWriter<MsgType>(),
+          m_acceptor(m_ioContext, asio::ip::tcp::endpoint(asio::ip::make_address(ip), port))
     {
         m_ioThreads.reserve(ioThreadsCount);
     }
-    ~BasicNetIOManager()
+    ~AbstractNetIOManager()
     {
         this->stop();
     }
 
+protected:
+
     virtual void onAsyncAccepted(std::error_code ec, socket socket)
     {
-        m_acceptor.async_accept(std::bind(&BasicNetIOManager::onAsyncAccepted,
+        m_acceptor.async_accept(std::bind(&AbstractNetIOManager::onAsyncAccepted,
                                           this,
                                           std::placeholders::_1,
                                           std::placeholders::_2)
                                 );
         if(!ec)
         {
-            std::cout << "New Connection accepted" << std::endl;
             shared_ptr<Session<MsgType>> newConnection = make_shared<Session<MsgType>>(std::move(socket));
+            onNewConnectionAccepted(newConnection);
             asio::async_read(newConnection->getSocket(),
                              asio::buffer(newConnection->getHeaderInBuffer(), NetMessageHeader<MsgType>::getHeaderSize()),
-                             std::bind(&BasicNetIOManager::onAsyncReadHeader,
+                             std::bind(&AbstractNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
                                        std::placeholders::_2,
@@ -58,7 +59,7 @@ public:
         }
         else
         {
-
+            // TODO log that a new connection could not be established
         }
     }
 
@@ -67,10 +68,9 @@ public:
         if(!ec)
         {
             session->deserializeHeader();
-            uint32_t bodySize = session->getTempHeader().calculateNeededSizeForThis();
             asio::async_read(session->getSocket(),
                              asio::buffer(session->getBodyInBuffer(), session->getTempHeader().getBodySize()),
-                             std::bind(&BasicNetIOManager::onAsyncReadBody,
+                             std::bind(&AbstractNetIOManager::onAsyncReadBody,
                                        this,
                                        std::placeholders::_1,
                                        std::placeholders::_2,
@@ -79,7 +79,14 @@ public:
         }
         else
         {
+            if(length == 0)
+            {
+                onConnectionClosedByClient(ec, session);
+            }
+            else // ?
+            {
 
+            }
         }
     }
 
@@ -87,24 +94,36 @@ public:
     {
         if(!ec)
         {
-            auto netMessage = m_bodyDeserializer->deserializeBody(session->getTempHeader(), session->getBodyInBuffer());
-            m_messageProcessor->processNetMessage(netMessage, session);
+            onNewMessageReadCompletely(session);
             asio::async_read(session->getSocket(),
                              asio::buffer(session->getHeaderInBuffer(), NetMessageHeader<MsgType>::getHeaderSize()),
-                             std::bind(&BasicNetIOManager::onAsyncReadHeader,
+                             std::bind(&AbstractNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
                                        std::placeholders::_2,
                                        session)
                              );
         }
+        else
+        {
+            if(length == 0)
+            {
+                session->getSocket().close();
+                // TODO log that there was an error
+            }
+            else // ?
+            {
+
+            }
+        }
     }
 
-    virtual void onAsyncWrite(std::error_code ec, std::size_t length)
+    virtual void onAsyncWrite(std::error_code ec, std::size_t length, char* outBuffer)
     {
         if(!ec)
         {
             // All good
+            delete [] outBuffer;
         }
         else
         {
@@ -112,6 +131,13 @@ public:
         }
     }
 
+    virtual void onNewConnectionAccepted(shared_ptr<Session<MsgType>> newConnection) = 0;
+
+    virtual void onConnectionClosedByClient(std::error_code ec, shared_ptr<Session<MsgType>> session) = 0;
+
+    virtual void onNewMessageReadCompletely(shared_ptr<Session<MsgType>> session) = 0;
+
+public:
     virtual void writeMessage(shared_ptr<NetMessage<MsgType>> msg, shared_ptr<Session<MsgType>> session) override
     {
         uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
@@ -119,10 +145,11 @@ public:
         msg->serialize(msgBuffer);
         asio::async_write(session->getSocket(),
                           asio::buffer(msgBuffer, msgSize),
-                          std::bind(&BasicNetIOManager::onAsyncWrite,
+                          std::bind(&AbstractNetIOManager::onAsyncWrite,
                           this,
                           std::placeholders::_1,
-                          std::placeholders::_2)
+                          std::placeholders::_2,
+                          msgBuffer)
                           );
     }
 
@@ -130,7 +157,7 @@ public:
 public:
     virtual void start() override
     {
-        m_acceptor.async_accept(std::bind(&BasicNetIOManager::onAsyncAccepted,
+        m_acceptor.async_accept(std::bind(&AbstractNetIOManager::onAsyncAccepted,
                                           this,
                                           std::placeholders::_1,
                                           std::placeholders::_2)
@@ -150,14 +177,7 @@ public:
                 thread.join();
     }
 
-    void setMessageProcessor(const shared_ptr<INetMessageProcessor<MsgType>> &newMessageProcessor)
-    {
-        m_messageProcessor = newMessageProcessor;
-    }
-    void setBodyDeserializer(const shared_ptr<INetMessageBodyDeserializer<MsgType> > &newBodyDeserializer)
-    {
-        m_bodyDeserializer = newBodyDeserializer;
-    }
+
 };
 
 

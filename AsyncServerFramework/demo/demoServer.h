@@ -1,41 +1,43 @@
 #pragma once
-#include "./NetMessages.h"
-#include "../AbstractAsyncServer.h"
-#include "../INetMessageProcessor.h"
-#include "./MessageBodyDeserializer.h"
 
-class DemoEchoServer : public AbstractAsyncServer<DemoNetMessageType>,
+#include "../IService.h"
+#include "./NetMessages.h"
+#include "./INetMessageProcessor.h"
+#include "./MessageBodyDeserializer.h"
+#include "./NetIOManager.h"
+
+class DemoEchoServer : public IService,
                        public INetMessageProcessor<DemoNetMessageType>,
                        public std::enable_shared_from_this<DemoEchoServer>
 {
+    NetIOManager m_netIoManager;
 public:
     DemoEchoServer(const std::string& ip, uint16_t port, int netIOThreadsCount)
-        : AbstractAsyncServer<DemoNetMessageType>(ip, std::move(port), std::move(netIOThreadsCount)),
-          INetMessageProcessor<DemoNetMessageType>()
+        : INetMessageProcessor<DemoNetMessageType>(),
+          m_netIoManager(ip, port, netIOThreadsCount)
     {
-        m_netIOManager->setMessageProcessor(shared_ptr<INetMessageProcessor<DemoNetMessageType>>(this));
-        m_netIOManager->setBodyDeserializer(
-                    shared_ptr<INetMessageBodyDeserializer<DemoNetMessageType>>(
-                        (INetMessageBodyDeserializer<DemoNetMessageType>*) new MessageBodyDeserializer()));
+        auto deserializer = shared_ptr<INetMessageBodyDeserializer<DemoNetMessageType>>(static_cast<INetMessageBodyDeserializer<DemoNetMessageType>*>(new MessageBodyDeserializer()));
+        m_netIoManager.setNetMessageDeserializer(deserializer);
+
+        auto processor = shared_ptr<INetMessageProcessor>(static_cast<INetMessageProcessor*>(this));
+        m_netIoManager.setNetMessageProcessor(processor);
     }
 
     // IService interface
 public:
     void start() override
     {
-        for (auto& service : m_services)
-            service->start();
+        m_netIoManager.start();
     }
     void stop() override
     {
-        for (auto& service : m_services)
-            service->stop();
+        m_netIoManager.stop();
     }
 
     // INetMessageProcessor interface
 public:
     virtual void processNetMessage(shared_ptr<NetMessage<DemoNetMessageType>> netMsg, shared_ptr<Session<DemoNetMessageType>> session) override
     {
-        this->m_netIOManager->writeMessage(netMsg, session);
+        this->m_netIoManager.writeMessage(netMsg, session); // echos the message back
     }
 };
