@@ -1,6 +1,6 @@
 #pragma once
-#include "./io/BasicNetMessage.h"
-#include "./Session.h"
+#include "../io/BasicNetMessage.h"
+#include "../Session.h"
 
 template<typename MsgType>
 class INetMessageProcessor : public std::enable_shared_from_this<INetMessageProcessor<MsgType>>
