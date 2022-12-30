@@ -21,9 +21,7 @@ public:
          std::enable_shared_from_this<NetMessageHeader<MsgType>>(),
          m_messageType(msgType),
          m_messageBodySize(msgBodySize)
-    {
-
-    }
+    {}
 
     // ISerializable interface
     virtual void deserialize(char *buffer) override
@@ -34,10 +32,8 @@ public:
 
     virtual void serialize(char *buffer) const override
     {
-        *(reinterpret_cast<MsgType*>(buffer)) = this->m_messageType;
-        buffer += sizeof (MsgType);
-
-        *(reinterpret_cast<uint32_t*>(buffer)) = this->m_messageBodySize;
+        ISerializable::serializePrimitiiveType<MsgType>(buffer, m_messageType);
+        ISerializable::serializePrimitiiveType<uint32_t>(buffer, m_messageBodySize, false);
     }
 
     virtual uint32_t calculateNeededSizeForThis() const override

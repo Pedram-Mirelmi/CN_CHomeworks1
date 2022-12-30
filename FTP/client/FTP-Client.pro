@@ -15,17 +15,18 @@ HEADERS += \
     AsyncNetFramework/io/BasicNetMessage.h \
     AsyncNetFramework/io/ISerializable.h \
     IResponseResolver.h \
-    ../NetMessages/AllNetMessages.hpp \
-    ../NetMessages/DownloadFileMessage.h \
-    ../NetMessages/FTP-Message-types.h \
-    ../NetMessages/FileContentMessage.h \
-    ../NetMessages/GetHelpMessage.h \
-    ../NetMessages/HelpContentMessage.h \
-    ../NetMessages/PasswordMessage.h \
-    ../NetMessages/QuitMessage.h \
-    ../NetMessages/ShortResponseMessage.h \
-    ../NetMessages/UploadFileMessage.h \
-    ../NetMessages/UsernameMessage.h \
+    NetMessages/AllNetMessages.hpp \
+    NetMessages/DownloadFileMessage.h \
+    NetMessages/FTP-Message-types.h \
+    NetMessages/FileContentMessage.h \
+    NetMessages/GetHelpMessage.h \
+    NetMessages/HelpContentMessage.h \
+    NetMessages/PasswordMessage.h \
+    NetMessages/QuitMessage.h \
+    NetMessages/ShortResponseMessage.h \
+    NetMessages/UploadFileMessage.h \
+    NetMessages/UsernameMessage.h \
     NetworkHandler.hpp \
-    ResponseHandler.hpp
+    ResponseHandler.hpp \
+    typedefs.hpp
 

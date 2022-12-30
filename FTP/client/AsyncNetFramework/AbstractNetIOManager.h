@@ -14,12 +14,12 @@ class AbstractNetIOManager : public IService,
                              public std::enable_shared_from_this<AbstractNetIOManager<MsgType>>
 {
     using socket = asio::ip::tcp::socket;
-    using end_point = asio::ip::tcp::endpoint;
+    using end_point = asio::ip::tcp::resolver::results_type;
     using string = std::string;
 protected:
     asio::io_context m_ioContext;
     socket m_socket;
-    end_point m_endPoint;
+    end_point m_endPoints;
 
     std::thread m_asioThread;
 
@@ -32,9 +32,9 @@ public:
     AbstractNetIOManager(const string& ip, uint16_t port)
         : IService(), m_socket(m_ioContext)
     {
-        m_endPoint.address(asio::ip::make_address(ip));
-        m_endPoint.port(port);
         m_headerInBuffer.resize(NetMessageHeader<MsgType>::getHeaderSize());
+        asio::ip::tcp::resolver resolver(m_ioContext);
+        m_endPoints = resolver.resolve(ip, std::to_string(port));
     }
     ~AbstractNetIOManager()
     {
@@ -57,10 +57,6 @@ protected:
 
 
         }
-        else
-        {
-
-        }
     }
 
     virtual void onAsyncReadHeader(std::error_code ec, std::size_t length)
@@ -70,8 +66,7 @@ protected:
             deserializeHeader();
             m_messageInBuff.resize(m_tempHeader.getBodySize() + NetMessageHeader<MsgType>::getHeaderSize());
             asio::async_read(m_socket,
-                             asio::buffer(m_messageInBuff.data() + NetMessageHeader<MsgType>::getMessageType(),
-                                          m_tempHeader.getBodySize()),
+                             asio::buffer(m_messageInBuff.data() + NetMessageHeader<MsgType>::getHeaderSize(), m_tempHeader.getBodySize()),
                              std::bind(&AbstractNetIOManager::onAsyncReadBody,
                                        this,
                                        std::placeholders::_1,
@@ -80,7 +75,8 @@ protected:
         }
         else
         {
-
+            if(length == 0)
+                onDisconnected();
         }
     }
 
@@ -97,9 +93,14 @@ protected:
                                        std::placeholders::_2)
                              );
         }
+        else
+        {
+            if(length == 0)
+                onDisconnected();
+        }
     }
 
-    virtual void onAsyncWrite(std::error_code ec, std::size_t length, const char* msgBuffer, size_t msgSize)
+    virtual void onAsyncWrite(std::error_code ec, std::size_t length, const char* msgBuffer)
     {
         if(!ec)
         {
@@ -107,7 +108,8 @@ protected:
         }
         else
         {
-
+            if(length == 0)
+                onDisconnected();
         }
     }
 
@@ -117,6 +119,9 @@ protected:
     }
 
     virtual void onNewMessageReadCompletely() = 0;
+
+    virtual void onDisconnected() = 0;
+
 public:
     virtual void writeMessage(shared_ptr<BasicNetMessage<MsgType>> msg)
     {
@@ -129,8 +134,7 @@ public:
                           this,
                           std::placeholders::_1,
                           std::placeholders::_2,
-                          msgBuffer,
-                          msgSize)
+                          msgBuffer)
                           );
     }
 
@@ -139,7 +143,7 @@ public:
     virtual void start() override
     {
         asio::async_connect(m_socket,
-                            m_endPoint,
+                            m_endPoints,
                             std::bind(&AbstractNetIOManager::onAsyncConnected,
                                       this,
                                       std::placeholders::_1,
