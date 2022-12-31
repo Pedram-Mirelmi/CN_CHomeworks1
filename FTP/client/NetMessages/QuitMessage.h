@@ -31,7 +31,7 @@ public:
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    FTPMessageType getMessageType() const override
     {
         return FTPMessageType::QUIT;
     }

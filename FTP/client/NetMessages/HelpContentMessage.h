@@ -47,8 +47,14 @@ public:
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    FTPMessageType getMessageType() const override
     {
         return FTPMessageType::HELP_CONTENT;
     }
+    const std::string &getHelpContent() const
+    {
+        return m_helpContent;
+    }
 };
+
+
