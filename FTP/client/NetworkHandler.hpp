@@ -75,11 +75,16 @@ protected:
 
     void onDisconnected() override
     {
+        AbstractNetIOManager::onDisconnected();
         std::cout << "disconnected from server!" << std::endl;
     }
 
 
 public:
+    void addPendingFile(std::string&& filename)
+    {
+        m_responseResolver->addPendingdDownloadFile(std::move(filename));
+    }
     void closeConnection()
     {
         m_socket.close();
