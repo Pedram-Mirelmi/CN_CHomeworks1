@@ -154,8 +154,8 @@ public:
     }
     virtual void stop() override
     {
-        m_ioContext.stop();
         m_socket.close();
+        m_ioContext.stop();
         if(m_asioThread.joinable())
             m_asioThread.join();
     }
