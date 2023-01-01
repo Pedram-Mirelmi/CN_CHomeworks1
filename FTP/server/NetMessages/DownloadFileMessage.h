@@ -5,7 +5,7 @@
 #include "../AsyncNetFramework/io/BasicNetMessage.h"
 
 #include "./FTP-Message-types.h"
-#include "typedefs.hpp"
+#include "../typedefs.hpp"
 
 class DownloadFileMessage : public BasicNetMessage<FTPMessageType>
 {

@@ -2,6 +2,7 @@
 
 #include "AsyncServerFramework/IService.h"
 #include "./NetMessages.h"
+#include "NetMessages/AllNetMessages.hpp"
 #include "./INetMessageProcessor.h"
 #include "./MessageBodyDeserializer.h"
 #include "./NetIOManager.h"
@@ -40,5 +41,13 @@ public:
     {
         // this->m_netIoManager.writeMessage(netMsg, session); // echos the message back
         std::cout << "recllajflajsdflajsdfl\n";
+        /**
+         * 
+         * download ... file
+         * 
+         * 
+        */
+
+        Down
     }
 };
