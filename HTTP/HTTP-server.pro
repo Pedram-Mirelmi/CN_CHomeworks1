@@ -20,4 +20,6 @@ HEADERS += \
     AsyncServerFramework/io/ISerializable.h \
     HTTPServer.h \
     INetMessageProcessor.hpp \
-    NetIOManager.hpp
+    NetIOManager.hpp \
+    NetMessages/HTTP-Request.hpp \
+    NetMessages/HTTP-Response.hpp

@@ -20,7 +20,7 @@ public:
 public:
     void processNetMessage(shared_ptr<HTTPMessage> netMsg, shared_ptr<Session> session) override
     {
-        if(netMsg->)
+//        if(netMsg->)
     }
 
     // IService interface

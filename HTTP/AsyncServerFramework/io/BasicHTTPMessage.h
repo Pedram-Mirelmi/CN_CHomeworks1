@@ -22,7 +22,7 @@ public:
 
     // ISerializable interface
 public:
-    void deserialize(char *buffer) override // buffer will be zero terminated since it's a string
+    virtual void deserialize(char *buffer) override // buffer will be zero terminated since it's a string
     {
         auto buffString = std::string(buffer);
 
@@ -40,7 +40,7 @@ public:
         memcpy(m_body.data(), buffString.data() + header_body_point+4, m_body.size());
     }
 
-    void serialize(char *buffer) const override
+    virtual void serialize(char *buffer) const override
     {
         ISerializable::serializeByteArray(buffer, m_startLine.data(), m_startLine.size());
 
@@ -53,7 +53,7 @@ public:
         }
     }
 
-    void parsHeaders(std::string&& headersString)
+    virtual void parsHeaders(std::string&& headersString)
     {
         // Headers are not important for now!
 //        std::stringstream stream(std::move(headersString));
@@ -64,7 +64,7 @@ public:
 //        }
     }
 
-    uint32_t calculateNeededSizeForThis() const override
+    virtual uint32_t calculateNeededSizeForThis() const override
     {
         uint32_t size = 0;
         size += m_startLine.size();
@@ -74,6 +74,10 @@ public:
         size += m_body.size();
         return size;
     }
+
+public:
+    enum Type {HTTP_REQUEST, HTTP_RESPONSE};
+    virtual Type getMessageType() = 0;
 };
 
 

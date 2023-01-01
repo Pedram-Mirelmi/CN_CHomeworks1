@@ -4,6 +4,7 @@
 #include <mutex>
 
 #include "./io/BasicHTTPMessage.h"
+#include "./NetMessages/HTTP-Request.hpp"
 
 using std::string;
 
@@ -22,7 +23,6 @@ public:
     Session(socket&& socket)
         :m_socket(std::move(socket))
     {
-        m_tempMessage = std::make_shared<HTTPMessage>();
     }
 
     Session(const Session& other) = delete;
@@ -61,6 +61,7 @@ public:
 
         if(!strcmp("GET", m_headerInBuffer.data()))
         {
+            m_tempMessage = std::make_shared<HTTPRequest>();
             m_tempMessage->deserialize(m_headerInBuffer.data());
             m_headerInBuffer.clear();
         }
