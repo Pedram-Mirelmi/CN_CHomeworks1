@@ -6,13 +6,13 @@
 #include "./MessageBodyDeserializer.h"
 #include "./NetIOManager.h"
 
-class EchoServer : public IService,
+class Server : public IService,
                        public INetMessageProcessor<NetMessageType>,
-                       public std::enable_shared_from_this<EchoServer>
+                       public std::enable_shared_from_this<Server>
 {
     NetIOManager m_netIoManager;
 public:
-    EchoServer(const std::string& ip, uint16_t port, int netIOThreadsCount)
+    Server(const std::string& ip, uint16_t port, int netIOThreadsCount)
         : INetMessageProcessor<NetMessageType>(),
           m_netIoManager(ip, port, netIOThreadsCount)
     {
@@ -38,6 +38,7 @@ public:
 public:
     virtual void processNetMessage(shared_ptr<NetMessage<NetMessageType>> netMsg, shared_ptr<Session<NetMessageType>> session) override
     {
-        this->m_netIoManager.writeMessage(netMsg, session); // echos the message back
+        // this->m_netIoManager.writeMessage(netMsg, session); // echos the message back
+        std::cout << "recllajflajsdflajsdfl\n";
     }
 };

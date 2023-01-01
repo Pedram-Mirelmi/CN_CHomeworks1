@@ -53,9 +53,6 @@ protected:
                                        std::placeholders::_2,
                                        newConnection)
                              );
-
-
-
         }
         else
         {

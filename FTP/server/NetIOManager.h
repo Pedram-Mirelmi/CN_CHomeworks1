@@ -13,8 +13,7 @@ public:
     {
 
     }
-
-    // AbstractNetIOManager interface
+     // AbstractNetIOManager interface
     void setNetMessageDeserializer(const shared_ptr<INetMessageBodyDeserializer<NetMessageType> > &newNetMessageDeserializer)
     {
         m_netMessageDeserializer = newNetMessageDeserializer;
@@ -28,10 +27,12 @@ protected:
     void onConnectionClosedByClient(std::error_code ec, shared_ptr<Session<NetMessageType>> session)  override
     {
         // TODO log the closure
+        std::cout << "connection closed\n";
     }
     void onNewMessageReadCompletely(shared_ptr<Session<NetMessageType>> session) override
     {
         // TODO log the read
+        std::cout << "read message";
         m_netMessageProcessor->processNetMessage(m_netMessageDeserializer->deserializeBody(session->getTempHeader(),
                                                                                            session->getBodyInBuffer()),
                                                  session);
@@ -40,6 +41,7 @@ protected:
     void onNewConnectionAccepted(shared_ptr<Session<NetMessageType> > newConnection) override
     {
         // TODO log the new connection
+        std::cout << "new connection accepted\n";
     }
 };
 

@@ -7,7 +7,7 @@ using namespace std;
 
 void startDemo()
 {
-    EchoServer server("127.0.0.1", 60001, 10);
+    Server server("127.0.0.1", 60001, 10);
     server.start();
     cin.get();
 }
