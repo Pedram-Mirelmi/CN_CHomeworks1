@@ -30,7 +30,7 @@ protected:
     }
     void onNewMessageReadCompletely(shared_ptr<Session> session) override
     {
-        m_messageProcessor->processNetMessage(session->getTempMessage(), session);
+        m_messageProcessor->processNetMessage(session->getTempRequest(), session);
     }
 public:
     void setMessageProcessor(const shared_ptr<INetMessageProcessor> &newMessageProcessor)

@@ -4,7 +4,7 @@
 #include <mutex>
 
 #include "./io/BasicHTTPMessage.h"
-#include "./NetMessages/HTTP-Request.hpp"
+#include "./io/HTTP-Request.hpp"
 
 using std::string;
 
@@ -17,12 +17,13 @@ class Session : public std::enable_shared_from_this<Session>
     asio::streambuf m_inStreamBuff;
     std::vector<char> m_headerInBuffer;
     std::vector<char> m_bodyInBuffer;
-    shared_ptr<HTTPMessage> m_tempMessage;
+    shared_ptr<HTTPRequest> m_tempRequest;
 public:
 
     Session(socket&& socket)
         :m_socket(std::move(socket))
     {
+        m_tempRequest = std::make_shared<HTTPRequest>();
     }
 
     Session(const Session& other) = delete;
@@ -56,15 +57,8 @@ public:
         auto headerReadSoFar = (char*)m_inStreamBuff.data().data();
         auto extraPoint = strstr(headerReadSoFar, "\r\n\r\n");
 
-        m_headerInBuffer = std::vector<char>(headerReadSoFar, extraPoint);
-        m_inStreamBuff.consume(m_headerInBuffer.size() + 4);
-
-        if(!strcmp("GET", m_headerInBuffer.data()))
-        {
-            m_tempMessage = std::make_shared<HTTPRequest>();
-            m_tempMessage->deserialize(m_headerInBuffer.data());
-            m_headerInBuffer.clear();
-        }
+        m_tempRequest->deserialize(headerReadSoFar);
+        m_inStreamBuff.consume(m_headerInBuffer.size() + 4);        
     }
 
     inline asio::streambuf &getInStreamBuff()
@@ -72,9 +66,9 @@ public:
         return m_inStreamBuff;
     }
 
-    inline shared_ptr<HTTPMessage> getTempMessage() const
+    inline shared_ptr<HTTPMessage> getTempRequest() const
     {
-        return m_tempMessage;
+        return m_tempRequest;
     }
 
 };

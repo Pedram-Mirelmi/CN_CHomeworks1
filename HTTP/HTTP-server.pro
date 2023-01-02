@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++11
+CONFIG += console c++20
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -18,8 +18,9 @@ HEADERS += \
     AsyncServerFramework/Session.h \
     AsyncServerFramework/io/BasicHTTPMessage.h \
     AsyncServerFramework/io/ISerializable.h \
+    AsyncServerFramework/io/HTTP-Request.hpp \
+    AsyncServerFramework/io/HTTP-Response.hpp \
     HTTPServer.h \
     INetMessageProcessor.hpp \
-    NetIOManager.hpp \
-    NetMessages/HTTP-Request.hpp \
-    NetMessages/HTTP-Response.hpp
+    NetIOManager.hpp
+

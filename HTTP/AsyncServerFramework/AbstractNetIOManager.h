@@ -67,18 +67,22 @@ protected:
         if(!ec)
         {
             session->deserializeHeader();
-            std::cout << "left: " << (char*)session->getInStreamBuff().data().data() << std::endl;
-            if(session->getInStreamBuff().size())
+            if(!session->getTempRequest()->hasBody())
             {
-                asio::async_read_until(session->getSocket(),
-                                       session->getInStreamBuff(),
-                                       "\r\n\r\n", // ????????
-                                       std::bind(&AbstractNetIOManager::onAsyncReadBody,
-                                               this,
-                                               std::placeholders::_1,
-                                               std::placeholders::_2,
-                                               session)
-                                       );
+                onNewMessageReadCompletely(session);
+            }
+            else // for requests with body (not included in the project [just GET]
+            {
+
+//                asio::async_read_until(session->getSocket(),
+              //                                       session->getInStreamBuff(),
+              //                                       "\r\n\r\n", // ????????
+              //                                       std::bind(&AbstractNetIOManager::onAsyncReadBody,
+              //                                               this,
+              //                                               std::placeholders::_1,
+              //                                               std::placeholders::_2,
+              //                                               session)
+              //                                       );
             }
 
         }
