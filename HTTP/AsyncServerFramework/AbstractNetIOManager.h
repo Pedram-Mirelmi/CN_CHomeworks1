@@ -66,6 +66,7 @@ protected:
     {
         if(!ec)
         {
+            std::cout << "read something" << std::endl;
             session->deserializeHeader();
             if(!session->getTempRequest()->hasBody())
             {

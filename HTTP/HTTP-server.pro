@@ -9,6 +9,7 @@ SOURCES += \
 SUBDIRS += \
     AsyncServerFramework/AsyncServerFramework.pro
 
+LIBS += -lfmt
 
 
 HEADERS += \
@@ -23,4 +24,7 @@ HEADERS += \
     HTTPServer.h \
     INetMessageProcessor.hpp \
     NetIOManager.hpp
+
+DISTFILES += \
+    404.html
 

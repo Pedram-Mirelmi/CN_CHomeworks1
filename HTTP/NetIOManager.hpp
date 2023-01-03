@@ -11,22 +11,19 @@ public:
     {
 
     }
-    // INetWriter interface
-public:
-    void writeMessage(shared_ptr<HTTPMessage> msg, std::shared_ptr<Session> session) override
-    {
-
-    }
-
 
 protected:
     void onNewConnectionAccepted(shared_ptr<Session> newConnection) override
     {
-        // TODO
+        std::cout << "Accepted a new Connection: \n"
+                  << "\tremote_endpoint:" << newConnection->getSocket().remote_endpoint()
+                  << "\tlocal_endpoint:" << newConnection->getSocket().local_endpoint() << std::endl;
     }
     void onConnectionClosedByClient(std::error_code ec, shared_ptr<Session> session) override
     {
-        // TODO
+        std::cout << "Connection closed \n"
+                  << "\tremote_endpoint:" << session->getSocket().remote_endpoint()
+                  << "\tlocal_endpoint:" << session->getSocket().local_endpoint() << std::endl;
     }
     void onNewMessageReadCompletely(shared_ptr<Session> session) override
     {

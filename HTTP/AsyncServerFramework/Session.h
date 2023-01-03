@@ -55,7 +55,6 @@ public:
     void deserializeHeader()
     {
         auto headerReadSoFar = (char*)m_inStreamBuff.data().data();
-        auto extraPoint = strstr(headerReadSoFar, "\r\n\r\n");
 
         m_tempRequest->deserialize(headerReadSoFar);
         m_inStreamBuff.consume(m_headerInBuffer.size() + 4);        
@@ -66,7 +65,7 @@ public:
         return m_inStreamBuff;
     }
 
-    inline shared_ptr<HTTPMessage> getTempRequest() const
+    inline shared_ptr<HTTPRequest> getTempRequest() const
     {
         return m_tempRequest;
     }

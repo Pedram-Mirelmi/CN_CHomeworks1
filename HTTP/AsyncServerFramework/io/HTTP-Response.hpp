@@ -28,6 +28,11 @@ public:
     void serialize(char *buffer) const override
     {
         HTTPMessage::serialize(buffer);
+        if(!m_body.empty())
+        {
+            buffer += calculateNeededSizeForThis() - m_body.size();
+            ISerializable::serializeByteArray(buffer, m_body.data(), m_body.size());
+        }
 
     }
 };

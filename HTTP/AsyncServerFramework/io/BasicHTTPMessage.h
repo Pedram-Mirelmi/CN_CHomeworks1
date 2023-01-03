@@ -50,6 +50,7 @@ public:
 
     virtual void serialize(char *buffer) const override
     {
+        auto backup = buffer;
         ISerializable::serializeByteArray(buffer, m_startLine.data(), m_startLine.size());
         ISerializable::serializeByteArray(buffer, "\r\n", 2);
         for (auto& pair : m_headers)
@@ -59,7 +60,7 @@ public:
             ISerializable::serializeByteArray(buffer, pair.second.data(), pair.second.size());
             ISerializable::serializeByteArray(buffer, "\r\n", 2);
         }
-        ISerializable::serializeByteArray(buffer, "\r\n", 2);
+        ISerializable::serializeByteArray(buffer, "\r\n\r\n", 4);
     }
 
     virtual void parsHeaders(std::string&& headersString)
@@ -70,7 +71,7 @@ public:
         {
             auto delimiter = line.find(":");
             auto key = line.substr(0, delimiter);
-            auto value = line.substr(delimiter, line.size()-delimiter);
+            auto value = line.substr(delimiter + 2, line.size()-delimiter-1);
             m_headers[key] = value;
         }
     }
@@ -79,14 +80,16 @@ public:
     {
         uint32_t size = 0;
         size += m_startLine.size();
+        size += 2; // \r\n
         for(auto& pair : m_headers)
             size += pair.first.size() + 2 + pair.second.size() + 2;
 
+        size += 4; // \r\n\r\n
         size += m_body.size();
         return size;
     }
 
-    inline bool hasBody()
+    virtual inline bool hasBody() const
     {
         return !m_startLine.starts_with("GET");
     }

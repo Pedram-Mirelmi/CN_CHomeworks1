@@ -19,13 +19,14 @@ public:
           m_netIoManager(std::move(ip), std::move(port), std::move(ioThreadsCount))
     {
         m_netIoManager.setMessageProcessor(shared_ptr<INetMessageProcessor>(this));
-        m_contentTypeValues["pdf"] = "application/pdf";
-        m_contentTypeValues["html"] = "text/html";
-        m_contentTypeValues["gif"] = "image/gif";
-        m_contentTypeValues["jpeg"] = "image/jpeg";
-        m_contentTypeValues["jpg"] = "image/jpeg";
-        m_contentTypeValues["png"] = "image/png";
-        m_contentTypeValues["mp3"] = "audio/mpeg";
+
+        m_contentTypeValues[".pdf"] = "application/pdf";
+        m_contentTypeValues[".html"] = "text/html";
+        m_contentTypeValues[".gif"] = "image/gif";
+        m_contentTypeValues[".jpeg"] = "image/jpeg";
+        m_contentTypeValues[".jpg"] = "image/jpeg";
+        m_contentTypeValues[".png"] = "image/png";
+        m_contentTypeValues[".mp3"] = "audio/mpeg";
     }
 
     // INetMessageProcessor interface
@@ -71,12 +72,12 @@ private:
         if(!std::filesystem::exists(filepath))
            filepath = "./404.html";
 
-        auto filecontent = readFileContent(netMsg->getUri());
+        auto filecontent = readFileContent(filepath);
         std::unordered_map<std::string, std::string> headers;
-        headers["Content-Type"] = m_contentTypeValues[filepath.extension()];
+        headers["Content-Type"] = m_contentTypeValues[filepath.extension().string()];
         headers["Content-Length"] = std::to_string(filecontent.size());
         if(filepath.extension() == "mp3")
-            headers["Content-Type"] = fmt::format("Content-Disposition: attachment; filename=\"{}\"", filepath.filename());
+            headers["Content-Type"] = fmt::format("Content-Disposition: attachment; filename=\"{}\"", filepath.filename().string());
 
         m_netIoManager.writeMessage(make_shared<HTTPResponse>(200, std::move(headers), std::move(filecontent)), std::move(session));
     }
