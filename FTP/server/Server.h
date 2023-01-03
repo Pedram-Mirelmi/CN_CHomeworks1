@@ -39,15 +39,6 @@ public:
 public:
     virtual void processNetMessage(shared_ptr<NetMessage<NetMessageType>> netMsg, shared_ptr<Session<NetMessageType>> session) override
     {
-        // this->m_netIoManager.writeMessage(netMsg, session); // echos the message back
-        std::cout << "recllajflajsdflajsdfl\n";
-        /**
-         * 
-         * download ... file
-         * 
-         * 
-        */
-
-        Down
+        
     }
 };

@@ -2,8 +2,7 @@
 #include <string>
 #include <cstring>
 
-#include "../AsyncNetFramework/io/BasicNetMessage.h"
-
+#include "../AsyncServerFramework/io/BasicNetMessage.h"
 #include "./FTP-Message-types.h"
 #include "../typedefs.hpp"
 

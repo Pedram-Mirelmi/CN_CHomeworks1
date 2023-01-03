@@ -1,9 +1,8 @@
 #pragma once
 
-#include "./AsyncNetFramework/AbstractNetIOManager.h"
-#include "NetMessages/FTP-Message-types.h"
-#include "./NetMessages/AllNetMessages.hpp"
-#include "./IResponseResolver.h"
+#include "../AsyncServerFramework/AbstractNetIOManager.h"
+#include "FTP-Message-types.h"
+#include "AllNetMessages.hpp"
 
 #include "../typedefs.hpp"
 

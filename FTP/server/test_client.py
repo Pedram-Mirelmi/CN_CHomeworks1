@@ -11,8 +11,8 @@ if __name__ == "__main__":
     
     
     msgType = (1).to_bytes(1, "little")
-    msgSize = (len("hellolasjflasdjf")).to_bytes(4, "little")
-    text = "hello".encode("ascii")
+    msgSize = (len("AliRanjbari")).to_bytes(4, "little")
+    text = "AliRanjbari".encode("ascii")
     msg = msgType + msgSize + text
     
     s.send(msg)
