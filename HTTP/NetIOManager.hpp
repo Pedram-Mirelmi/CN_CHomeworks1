@@ -35,6 +35,15 @@ public:
         m_messageProcessor = newMessageProcessor;
     }
 
+
+    // IService interface
+public:
+    void start() override
+    {
+        // add current thread as well
+        AbstractNetIOManager::start();
+        m_ioContext.run();
+    }
 };
 
 
