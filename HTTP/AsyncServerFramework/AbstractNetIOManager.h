@@ -105,14 +105,6 @@ protected:
         if(!ec)
         {
             onNewMessageReadCompletely(session);
-//            asio::async_read(session->getSocket(),
-//                             session->getInStreamBuff(),
-//                             std::bind(&AbstractNetIOManager::onAsyncReadHeader,
-//                                       this,
-//                                       std::placeholders::_1,
-//                                       std::placeholders::_2,
-//                                       session)
-//                             );
         }
         else
         {
@@ -151,14 +143,8 @@ public:
     {
         std::stringstream stream;
         msg->serialize(stream);
-        auto str = stream.str();
-        auto buff = str.data();
         asio::write(session->getSocket(),
                           asio::buffer(stream.view())
-//                          std::bind(&AbstractNetIOManager::onAsyncWrite,
-//                          this,
-//                          std::placeholders::_1,
-//                          std::placeholders::_2)
                           );
     }
 

@@ -69,7 +69,7 @@ private:
     void handleGET(shared_ptr<HTTPRequest> netMsg, shared_ptr<Session> session)
     {
         std::filesystem::path filepath = toFilePath(netMsg->getUri());
-        if(!std::filesystem::exists(filepath))
+        if(!std::filesystem::exists(filepath) || filepath.string().find(".") == std::string::npos)
            filepath = "./404.html";
 
         auto filecontent = readFileContent(filepath);
@@ -83,8 +83,7 @@ private:
     std::string toFilePath(const std::string& uri)
     {
         std::string filepath;
-        auto dotPoint = uri.rfind('.');
-        return dotPoint == std::string::npos ? "./index.html" : std::string(".") + uri;
+        return uri == "/" ? "./index.html" : std::string(".") + uri;
     }
 
     std::vector<char> readFileContent(const std::string& filepath)
