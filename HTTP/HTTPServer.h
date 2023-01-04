@@ -76,8 +76,6 @@ private:
         std::unordered_map<std::string, std::string> headers;
         headers["Content-Type"] = m_contentTypeValues[filepath.extension().string()];
         headers["Content-Length"] = std::to_string(filecontent.size());
-        if(filepath.extension() == "mp3")
-            headers["Content-Type"] = fmt::format("Content-Disposition: attachment; filename=\"{}\"", filepath.filename().string());
 
         m_netIoManager.writeMessage(make_shared<HTTPResponse>(200, std::move(headers), std::move(filecontent)), std::move(session));
     }
