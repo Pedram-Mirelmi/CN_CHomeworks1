@@ -26,5 +26,6 @@ HEADERS += \
     NetIOManager.hpp
 
 DISTFILES += \
-    404.html
+    404.html \
+    README.md
 
