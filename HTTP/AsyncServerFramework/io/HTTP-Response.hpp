@@ -25,14 +25,12 @@ public:
 
     // ISerializable interface
 public:
-    void serialize(char *buffer) const override
+    void serialize(stringstream& stream) const override
     {
-        HTTPMessage::serialize(buffer);
+        HTTPMessage::serialize(stream);
+
         if(!m_body.empty())
-        {
-            buffer += calculateNeededSizeForThis() - m_body.size();
-            ISerializable::serializeByteArray(buffer, m_body.data(), m_body.size());
-        }
+            ISerializable::serializeByteArray(stream, m_body.data(), m_body.size());
 
     }
 };

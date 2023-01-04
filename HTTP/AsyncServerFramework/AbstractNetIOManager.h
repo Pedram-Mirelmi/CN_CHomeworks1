@@ -67,7 +67,7 @@ protected:
         if(!ec)
         {
             std::cout << "read something" << std::endl;
-            session->deserializeHeader();
+            session->deserializeHeader(length);
             if(!session->getTempRequest()->hasBody())
             {
                 onNewMessageReadCompletely(session);
@@ -128,16 +128,15 @@ protected:
         }
     }
 
-    virtual void onAsyncWrite(std::error_code ec, std::size_t length, char* outBuffer)
+    virtual void onAsyncWrite(std::error_code ec, std::size_t length)
     {
         if(!ec)
         {
-            // All good
-            delete [] outBuffer;
+            std::cout << "all sent: " << length << std::endl;
         }
         else
         {
-
+            std::cout << "error, sent: " << length << std::endl;
         }
     }
 
@@ -150,16 +149,16 @@ protected:
 public:
     virtual void writeMessage(shared_ptr<HTTPMessage> msg, shared_ptr<Session> session) override
     {
-        uint32_t msgSize = msg->calculateNeededSizeForThis();
-        char* msgBuffer = new char[msgSize];
-        msg->serialize(msgBuffer);
-        asio::async_write(session->getSocket(),
-                          asio::buffer(msgBuffer, msgSize),
-                          std::bind(&AbstractNetIOManager::onAsyncWrite,
-                          this,
-                          std::placeholders::_1,
-                          std::placeholders::_2,
-                          msgBuffer)
+        std::stringstream stream;
+        msg->serialize(stream);
+        auto str = stream.str();
+        auto buff = str.data();
+        asio::write(session->getSocket(),
+                          asio::buffer(stream.view())
+//                          std::bind(&AbstractNetIOManager::onAsyncWrite,
+//                          this,
+//                          std::placeholders::_1,
+//                          std::placeholders::_2)
                           );
     }
 

@@ -15,8 +15,6 @@ class Session : public std::enable_shared_from_this<Session>
 
     socket m_socket;
     asio::streambuf m_inStreamBuff;
-    std::vector<char> m_headerInBuffer;
-    std::vector<char> m_bodyInBuffer;
     shared_ptr<HTTPRequest> m_tempRequest;
 public:
 
@@ -42,22 +40,16 @@ public:
     {
         return m_socket;
     }
-    inline std::vector<char>& getHeaderInBuffer()
-    {
-        return m_headerInBuffer;
-    }
 
-    inline std::vector<char>& getBodyInBuffer()
-    {
-        return m_bodyInBuffer;
-    }
-
-    void deserializeHeader()
+    void deserializeHeader(std::size_t bytesTransfered)
     {
         auto headerReadSoFar = (char*)m_inStreamBuff.data().data();
 
-        m_tempRequest->deserialize(headerReadSoFar);
-        m_inStreamBuff.consume(m_headerInBuffer.size() + 4);        
+        std::stringstream stream;
+        stream.write(headerReadSoFar, bytesTransfered);
+
+        m_tempRequest->deserialize(stream);
+        m_inStreamBuff.consume(m_tempRequest->calculateNeededSizeForThis() + 4);
     }
 
     inline asio::streambuf &getInStreamBuff()

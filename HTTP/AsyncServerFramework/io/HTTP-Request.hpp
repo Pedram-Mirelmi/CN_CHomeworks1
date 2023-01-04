@@ -29,9 +29,9 @@ public:
     }
     // ISerializable interface
 public:
-    void deserialize(char *buffer) override
+    void deserialize(stringstream& stream) override
     {
-        HTTPMessage::deserialize(buffer);
+        HTTPMessage::deserialize(stream);
         parseStartLine();
     }
 

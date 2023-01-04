@@ -2,47 +2,42 @@
 
 #include <memory>
 #include <cstring>
+#include <sstream>
 
 using std::shared_ptr;
 
 class ISerializable : public std::enable_shared_from_this<ISerializable>
 {
+protected:
+    using stringstream = std::stringstream;
 public:
-    virtual void deserialize(char* buffer) = 0;
+    virtual void deserialize(stringstream& stream) = 0;
 
-    virtual void serialize(char* buffer) const = 0;
+    virtual void serialize(stringstream& stream) const = 0;
 
     virtual uint32_t calculateNeededSizeForThis() const = 0;
 
     template<typename primitive_t>
-    static void serializePrimitiiveType(char*& buffer, primitive_t primitive_value, bool updateBuffer = true)
+    static void serializePrimitiiveType(stringstream& stream, primitive_t primitive_value)
     {
-        *(reinterpret_cast<primitive_t*>(buffer)) = primitive_value;
-        if(updateBuffer)
-            buffer += sizeof(primitive_t);
+        stream.write(reinterpret_cast<char*>(&primitive_value), sizeof(primitive_t));
     }
 
 
     template<typename primitive_t>
-    static void deserializePrimitiveType(char*& buffer, primitive_t& primitive, bool updateBuffer = true)
+    static void deserializePrimitiveType(stringstream& stream, primitive_t& primitive)
     {
-        primitive = *(reinterpret_cast<primitive_t*>(buffer));
-        if(updateBuffer)
-            buffer += sizeof(primitive_t);
+        stream.read(reinterpret_cast<char*>(&primitive), sizeof(primitive_t));
     }
 
 
-    static void serializeByteArray(char*& buffer, const char* byteArray, uint32_t size, bool updateBuffer = true)
+    static void serializeByteArray(stringstream& stream, const char* byteArray, uint32_t size)
     {
-        memcpy(buffer, byteArray, size);
-        if(updateBuffer)
-            buffer += size;
+        stream.write(byteArray, size);
     }
 
-    static void deserializeByteArray(char*& buffer, char* byteArray, uint32_t size, bool updateBuffer = true)
+    static void deserializeByteArray(stringstream& stream, char* byteArray, uint32_t size)
     {
-        memcpy(byteArray, buffer, size);
-        if(updateBuffer)
-            buffer += size;
+        stream.read(byteArray, size);
     }
 };

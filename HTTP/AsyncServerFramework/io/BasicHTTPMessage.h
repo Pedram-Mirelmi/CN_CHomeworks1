@@ -27,47 +27,41 @@ public:
 
     // ISerializable interface
 public:
-    virtual void deserialize(char *buffer) override // buffer will be zero terminated since it's a string
+    virtual void deserialize(stringstream& stream) override // buffer will be zero terminated since it's a string
     {
-        char* start_header_point;
-        char* header_body_point;
+        auto view = stream.view();
 
-//        start_header_point = buffString.find("\r\n");
-        start_header_point = strstr(buffer, "\r\n");
-//        header_body_point = buffString.find("\r\n\r\n");
-        header_body_point = strstr(buffer, "\r\n\r\n");
+        m_startLine = std::move(view.substr(0, view.find("\r\n")));
 
-        m_startLine = std::string(buffer, start_header_point);
+        stream.seekp(m_startLine.size() + 2, std::ios::cur);
 
-        parsHeaders(std::string(start_header_point + 2, header_body_point));
+        parsHeaders(stream);
 
         if(hasBody()) // not in this project
         {
             m_body.resize(std::stoi(m_headers["Content-Length"]));
-            memcpy(m_body.data(), header_body_point + 4, m_body.size());
+            stream.read(m_body.data(), m_body.size());
         }
     }
 
-    virtual void serialize(char *buffer) const override
+    virtual void serialize(stringstream& stream) const override
     {
-        auto backup = buffer;
-        ISerializable::serializeByteArray(buffer, m_startLine.data(), m_startLine.size());
-        ISerializable::serializeByteArray(buffer, "\r\n", 2);
+        ISerializable::serializeByteArray(stream, m_startLine.data(), m_startLine.size());
+        ISerializable::serializeByteArray(stream, "\r\n", 2);
         for (auto& pair : m_headers)
         {
-            ISerializable::serializeByteArray(buffer, pair.first.data(), pair.first.size());
-            ISerializable::serializeByteArray(buffer, ": ", 2);
-            ISerializable::serializeByteArray(buffer, pair.second.data(), pair.second.size());
-            ISerializable::serializeByteArray(buffer, "\r\n", 2);
+            ISerializable::serializeByteArray(stream, pair.first.data(), pair.first.size());
+            ISerializable::serializeByteArray(stream, ": ", 2);
+            ISerializable::serializeByteArray(stream, pair.second.data(), pair.second.size());
+            ISerializable::serializeByteArray(stream, "\r\n", 2);
         }
-        ISerializable::serializeByteArray(buffer, "\r\n\r\n", 4);
+        ISerializable::serializeByteArray(stream, "\r\n", 2);
     }
 
-    virtual void parsHeaders(std::string&& headersString)
+    virtual void parsHeaders(stringstream& stream)
     {
-        std::stringstream headersStream(std::move(headersString));
         std::string line;
-        while(getline(headersStream, line))
+        while(getline(stream, line))
         {
             auto delimiter = line.find(":");
             auto key = line.substr(0, delimiter);
