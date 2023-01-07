@@ -16,4 +16,6 @@ if __name__ == "__main__":
     msg = msgType + msgSize + text
         
     s.send(msg)
+    # a = s.recv(1024)
+    # print(a)
     s.close()

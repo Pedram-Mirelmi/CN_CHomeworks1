@@ -49,6 +49,11 @@ public:
                + m_filename.size(); // the username bytes
     }
 
+    std::string get_file_name(){
+        return this->m_filename;
+    }
+
+
     // BasicNetMessage interface
 public:
     const NetMessageType& getMessageType() const override

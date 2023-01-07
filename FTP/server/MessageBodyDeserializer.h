@@ -29,6 +29,7 @@ public:
             }
             case NetMessageType::PASSWORD:
             {
+                // std::cout << "PASSWORD\n";
                 auto message = shared_ptr<PasswordMessage>(new PasswordMessage());
                 message->deserialize(bodyBuffer);
                 return shared_ptr<_BNetMsg>(message);   

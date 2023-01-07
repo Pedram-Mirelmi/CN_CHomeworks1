@@ -6,5 +6,5 @@ template<typename MsgType>
 class INetMessageProcessor : public std::enable_shared_from_this<INetMessageProcessor<MsgType>>
 {
 public:
-    virtual void processNetMessage(shared_ptr<NetMessage<MsgType>> netMsg, shared_ptr<Session<MsgType>> session) = 0;
+    virtual void processNetMessage(shared_ptr<NetMessage<MsgType>> netMsg, NetMessageType msg_type,  shared_ptr<Session<MsgType>> session) = 0;
 };

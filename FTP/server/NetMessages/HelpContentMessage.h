@@ -10,11 +10,13 @@ class HelpContentMessage : public _BNetMsg
 protected:
     std::string m_helpContent;
     // ISerializable interface
-    typedef uint16_t _helpContentSize_T  ;
+    typedef uint16_t _helpContentSize_T;
 public:
     HelpContentMessage()
         :_BNetMsg(NetMessageType::HELP_CONTENT, m_helpContent.size())
-    {}
+    {
+        this->m_helpContent = "USER \[name\],It's argument is used to specify the user's string";
+    }
 public:
     void deserialize(char *buffer) override
     {

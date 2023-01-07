@@ -81,6 +81,11 @@ public:
         return false;
     }
 
+    bool quit() {
+        this->is_authenticated = false;
+        this->is_user_name_set = false;
+        this->user = NULL;
+    }   
 
 };
 
