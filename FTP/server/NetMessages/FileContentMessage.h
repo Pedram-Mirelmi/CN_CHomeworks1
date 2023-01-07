@@ -5,7 +5,7 @@
 #include "../typedefs.hpp"
 
 
-class FileContentMessage : public BasicNetMessage<FTPMessageType>
+class FileContentMessage : public _BNetMsg
 {
     typedef uint32_t _fileSize_T ;
 protected:
@@ -14,14 +14,14 @@ protected:
 public:
     FileContentMessage() = default;
     FileContentMessage(std::vector<char>&& content)
-        :_BNetMsg(FTPMessageType::FILE_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        :_BNetMsg(NetMessageType::FILE_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize()),
          m_fileContent(std::move(content))
     {}
 public:
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         _fileSize_T contentSize;
         ISerializable::deserializePrimitiveType<_fileSize_T>(buffer, contentSize);
@@ -32,7 +32,7 @@ public:
     void serialize(char *buffer) const override
     {
         m_header.serialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         ISerializable::serializePrimitiiveType<_fileSize_T>(buffer, static_cast<_fileSize_T>(m_fileContent.size()));
 
@@ -40,15 +40,15 @@ public:
     }
     uint32_t calculateNeededSizeForThis() const override
     {
-        return NetMessageHeader<FTPMessageType>::getHeaderSize()
+        return NetMessageHeader<NetMessageType>::getHeaderSize()
                + sizeof(_fileSize_T)
                + m_fileContent.size();
     }
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    const NetMessageType &getMessageType() const override
     {
-        return FTPMessageType::FILE_CONTENT;
+        return NetMessageType::FILE_CONTENT;
     }
 };

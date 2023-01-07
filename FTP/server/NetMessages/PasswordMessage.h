@@ -3,11 +3,11 @@
 #include <cstring>
 
 #include "../AsyncServerFramework/io/BasicNetMessage.h"
-
-#include "./FTP-Message-types.h"
-
+// #include "./FTP-Message-types.h"
+#include "../NetMessageTypes.h"
 #include "../typedefs.hpp"
-class PasswordMessage : public BasicNetMessage<FTPMessageType>
+
+class PasswordMessage : public _BNetMsg
 {
     typedef uint8_t _passwordSize_T;
 protected:
@@ -17,20 +17,20 @@ protected:
 public:
     PasswordMessage() = default;
     PasswordMessage(const std::string& password)
-        : _BNetMsg(FTPMessageType::PASSWORD, password.size()),
+        : _BNetMsg(NetMessageType::PASSWORD, password.size()),
           m_password(password)
     {}
 
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         _passwordSize_T passwordSize;
         ISerializable::deserializePrimitiveType<_passwordSize_T>(buffer, passwordSize);
 
         m_password.resize(passwordSize);
-        ISerializable::serializeByteArray(buffer, m_password.data(), passwordSize, false);
+        ISerializable::serializeByteArray(buffer, m_password.data(), passwordSize, true);
     }
     void serialize(char *buffer) const override
     {
@@ -48,11 +48,15 @@ public:
                + sizeof (_passwordSize_T) // length of the password in a 8-bit unsigned int ( must be under 256 character)
                + m_password.size(); // the username bytes
     }
+    
+    std::string get_password() {
+        return this->m_password;
+    }
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType& getMessageType() const override
+    const NetMessageType& getMessageType() const override
     {
-        return FTPMessageType::PASSWORD;
+        return NetMessageType::PASSWORD;
     }
 };

@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include "../AsyncServerFramework/io/BasicNetMessage.h"
-#include "./FTP-Message-types.h"
+#include "../NetMessageTypes.h"
 #include "../typedefs.hpp"
 
 class UsernameMessage : public _BNetMsg
@@ -15,7 +15,7 @@ protected:
 public:
     UsernameMessage() = default;
     UsernameMessage(const std::string& username)
-        :_BNetMsg(FTPMessageType::USERNAME, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        :_BNetMsg(NetMessageType::USERNAME, calculateNeededSizeForThis() - _Header::getHeaderSize()),
          m_username(username)
     {}
 
@@ -28,7 +28,7 @@ public:
         ISerializable::deserializePrimitiveType<uint8_t>(buffer, usernameSize);
         m_username.resize(usernameSize);
 
-        ISerializable::deserializeByteArray(buffer, m_username.data(), usernameSize, false);
+        ISerializable::deserializeByteArray(buffer, m_username.data(), usernameSize, true);
     }
     void serialize(char *buffer) const override
     {
@@ -49,10 +49,14 @@ public:
                + m_username.size(); // the username bytes
     }
 
+    std::string get_username(){
+        return this->m_username;
+    }
+
     // BasicNetMessage interface
 public:
-    const FTPMessageType& getMessageType() const override
+    const NetMessageType& getMessageType() const override
     {
-        return FTPMessageType::USERNAME;
+        return NetMessageType::USERNAME;
     }
 };

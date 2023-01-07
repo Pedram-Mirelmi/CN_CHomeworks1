@@ -1,11 +1,10 @@
 #pragma once
 
 #include "../AsyncServerFramework/AbstractNetIOManager.h"
-#include "FTP-Message-types.h"
-
+#include "../NetMessageTypes.h"
 #include "../typedefs.hpp"
 
-class ShortResponseMessage : public BasicNetMessage<FTPMessageType>
+class ShortResponseMessage : public _BNetMsg
 {
     typedef u_int16_t _responseNum_T ;
 protected:
@@ -15,7 +14,7 @@ protected:
 public:
     ShortResponseMessage() = default;
     ShortResponseMessage(uint16_t responseNumber)
-        : _BNetMsg(FTPMessageType::SHORT_RESPONSE, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        : _BNetMsg(NetMessageType::SHORT_RESPONSE, calculateNeededSizeForThis() - _Header::getHeaderSize()),
           m_responseNumber(std::move(responseNumber))
 
     {}
@@ -23,7 +22,7 @@ public:
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         ISerializable::deserializePrimitiveType<_responseNum_T>(buffer, m_responseNumber, false);
     }
@@ -31,22 +30,22 @@ public:
     void serialize(char *buffer) const override
     {
         m_header.serialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         ISerializable::serializePrimitiiveType<_responseNum_T>(buffer, static_cast<_responseNum_T>(m_responseNumber), false);
     }
 
     uint32_t calculateNeededSizeForThis() const override
     {
-        return NetMessageHeader<FTPMessageType>::getHeaderSize()
+        return NetMessageHeader<NetMessageType>::getHeaderSize()
                + sizeof (_responseNum_T);
     }
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    const NetMessageType &getMessageType() const override
     {
-        return FTPMessageType::SHORT_RESPONSE;
+        return NetMessageType::SHORT_RESPONSE;
     }
 
     uint16_t getResponseNumber() const

@@ -31,11 +31,11 @@ protected:
     }
     void onNewMessageReadCompletely(shared_ptr<Session<NetMessageType>> session) override
     {
+        std::cout << "read completely\n";
         // TODO log the read
-        std::cout << "read message\n";
         m_netMessageProcessor->processNetMessage(m_netMessageDeserializer->deserializeBody(session->getTempHeader(),
                                                                                            session->getBodyInBuffer()),
-                                                 session);
+                                                session);
     }
 
     void onNewConnectionAccepted(shared_ptr<Session<NetMessageType> > newConnection) override

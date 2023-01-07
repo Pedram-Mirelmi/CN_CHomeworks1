@@ -1,19 +1,18 @@
 #pragma once
 
 #include "../AsyncServerFramework/AbstractNetIOManager.h"
-#include "FTP-Message-types.h"
+#include "../NetMessageTypes.h"
 #include "AllNetMessages.hpp"
-
 #include "../typedefs.hpp"
 
-class GetHelpMessage : public BasicNetMessage<FTPMessageType>
+class GetHelpMessage : public _BNetMsg
 {
 
 
     // ISerializable interface
 public:
     GetHelpMessage()
-        :_BNetMsg(FTPMessageType::GET_HELP, 0)
+        :_BNetMsg(NetMessageType::GET_HELP, 0)
     {}
     void deserialize(char *buffer) override
     {
@@ -25,14 +24,14 @@ public:
     }
     uint32_t calculateNeededSizeForThis() const override
     {
-        return NetMessageHeader<FTPMessageType>::getHeaderSize();
+        return NetMessageHeader<NetMessageType>::getHeaderSize();
     }
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    const NetMessageType &getMessageType() const override
     {
-        return FTPMessageType::GET_HELP;
+        return NetMessageType::GET_HELP;
     }
 };
 

@@ -1,1 +1,4 @@
 /NetMessages copy
+*.py
+*.out
+setting.json

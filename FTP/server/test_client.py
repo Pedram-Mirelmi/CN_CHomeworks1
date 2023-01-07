@@ -1,7 +1,7 @@
 import socket
 
 
-PORT = 60001
+PORT = 8000
 HOST = "127.0.0.1"
 
 
@@ -14,9 +14,6 @@ if __name__ == "__main__":
     msgSize = (len("AliRanjbari")).to_bytes(4, "little")
     text = "AliRanjbari".encode("ascii")
     msg = msgType + msgSize + text
-    
+        
     s.send(msg)
-    # for i in range(30000000):
-    #     pass
-    # s.close()
-    # data = s.recv(1024)
+    s.close()

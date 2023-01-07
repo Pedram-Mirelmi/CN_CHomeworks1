@@ -3,11 +3,10 @@
 #include <cstring>
 
 #include "../AsyncServerFramework/io/BasicNetMessage.h"
-
-#include "./FTP-Message-types.h"
+#include "../NetMessageTypes.h"
 #include "../typedefs.hpp"
 
-class DownloadFileMessage : public BasicNetMessage<FTPMessageType>
+class DownloadFileMessage : public _BNetMsg
 {
     typedef uint16_t _filenameSize_T ;
 protected:
@@ -17,14 +16,14 @@ protected:
 public:
     DownloadFileMessage() = default;
     DownloadFileMessage(const std::string& filename)
-        : _BNetMsg(FTPMessageType::DOWNLOAD_FILE, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        : _BNetMsg(NetMessageType::DOWNLOAD_FILE, calculateNeededSizeForThis() - _Header::getHeaderSize()),
           m_filename(filename)
     {}
 
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         _filenameSize_T filenameSize;
         ISerializable::deserializePrimitiveType<_filenameSize_T>(buffer, filenameSize);
@@ -52,8 +51,8 @@ public:
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType& getMessageType() const override
+    const NetMessageType& getMessageType() const override
     {
-        return FTPMessageType::USERNAME;
+        return NetMessageType::USERNAME;
     }
 };

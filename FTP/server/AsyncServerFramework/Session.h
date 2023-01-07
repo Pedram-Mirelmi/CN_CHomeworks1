@@ -5,6 +5,7 @@
 
 #include "io/BasicNetMessage.h"
 #include "./io/BasicNetMessage.h"
+#include "Config.h"
 
 using std::string;
 
@@ -12,6 +13,11 @@ template <typename MsgType>
 class Session : public std::enable_shared_from_this<Session<MsgType>>
 {
     using socket = asio::ip::tcp::socket;
+
+    // user information variables
+    User user;
+    bool is_user_name_set = false;
+    bool is_authenticated = false;
 
 
     socket m_socket;
@@ -59,6 +65,22 @@ public:
     {
         return m_tempHeader;
     }
+
+    // user information functions
+
+    void set_user(User& user) {
+        this->user = user;
+        this->is_user_name_set = true;
+    }
+
+    bool check_password(const string password) {
+        if(this->user.password == password) {
+            this->is_authenticated = true;
+            return true;
+        }
+        return false;
+    }
+
 
 };
 

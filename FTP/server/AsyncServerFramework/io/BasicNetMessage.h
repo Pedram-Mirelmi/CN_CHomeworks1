@@ -71,6 +71,10 @@ protected:
     NetMessageHeader<MsgType> m_header;
 public:
     virtual const MsgType& getMessageType() const = 0;
+    const MsgType& getMessageType() {
+        return this->m_header.getMessageType();
+    }
+    NetMessage() = default;
     NetMessage(MsgType msgType, uint32_t bodySize)
         :m_header(msgType, bodySize)
     {}

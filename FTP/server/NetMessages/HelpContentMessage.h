@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../AsyncServerFramework/AbstractNetIOManager.h"
-#include "FTP-Message-types.h"
 #include "AllNetMessages.hpp"
-
+#include "../NetMessageTypes.h"
 #include "../typedefs.hpp"
 
-class HelpContentMessage : public BasicNetMessage<FTPMessageType>
+class HelpContentMessage : public _BNetMsg
 {
 protected:
     std::string m_helpContent;
@@ -14,13 +13,13 @@ protected:
     typedef uint16_t _helpContentSize_T  ;
 public:
     HelpContentMessage()
-        :_BNetMsg(FTPMessageType::HELP_CONTENT, m_helpContent.size())
+        :_BNetMsg(NetMessageType::HELP_CONTENT, m_helpContent.size())
     {}
 public:
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         _helpContentSize_T contentSize;
         ISerializable::deserializePrimitiveType<_helpContentSize_T>(buffer, contentSize);
@@ -31,7 +30,7 @@ public:
     void serialize(char *buffer) const override
     {
         m_header.serialize(buffer);
-        buffer += NetMessageHeader<FTPMessageType>::getHeaderSize();
+        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
 
         ISerializable::serializePrimitiiveType<_helpContentSize_T>(buffer, static_cast<_helpContentSize_T>(m_helpContent.size()));
 
@@ -39,15 +38,15 @@ public:
     }
     uint32_t calculateNeededSizeForThis() const override
     {
-        return NetMessageHeader<FTPMessageType>::getHeaderSize()
+        return NetMessageHeader<NetMessageType>::getHeaderSize()
                + sizeof(_helpContentSize_T)
                + m_helpContent.size();
     }
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    const NetMessageType &getMessageType() const override
     {
-        return FTPMessageType::HELP_CONTENT;
+        return NetMessageType::HELP_CONTENT;
     }
 };

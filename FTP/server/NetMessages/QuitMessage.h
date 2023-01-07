@@ -1,17 +1,16 @@
 #pragma once
 
 #include "../AsyncServerFramework/AbstractNetIOManager.h"
-#include "FTP-Message-types.h"
 #include "./NetMessages/AllNetMessages.hpp"
-
+#include "../NetMessageTypes.h"
 #include "../typedefs.hpp"
 
-class QuitMessage : public BasicNetMessage<FTPMessageType>
+class QuitMessage : public _BNetMsg
 {
     // ISerializable interface
 public:
     QuitMessage()
-        :_BNetMsg(FTPMessageType::QUIT, 0)
+        :_BNetMsg(NetMessageType::QUIT, 0)
     {}
 public:
 
@@ -25,14 +24,14 @@ public:
     }
     uint32_t calculateNeededSizeForThis() const override
     {
-        return NetMessageHeader<FTPMessageType>::getHeaderSize();
+        return NetMessageHeader<NetMessageType>::getHeaderSize();
     }
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    const NetMessageType &getMessageType() const override
     {
-        return FTPMessageType::QUIT;
+        return NetMessageType::QUIT;
     }
 };
 
