@@ -20,9 +20,6 @@ public:
 public:
     void deserialize(char *buffer) override
     {
-        m_header.deserialize(buffer);
-        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
-
         _helpContentSize_T contentSize;
         ISerializable::deserializePrimitiveType<_helpContentSize_T>(buffer, contentSize);
 

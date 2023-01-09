@@ -22,9 +22,6 @@ public:
 
     void deserialize(char *buffer) override
     {
-        m_header.deserialize(buffer);
-        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
-
         _filenameSize_T filenameSize;
         ISerializable::deserializePrimitiveType<_filenameSize_T>(buffer, filenameSize);
 

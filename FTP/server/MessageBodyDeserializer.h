@@ -19,9 +19,6 @@ public:
         {
             case NetMessageType::USERNAME:
             {
-                // std::cout << "USERNAME\n";
-                // std::cout << "body: " << bodyBuffer << '\n';
-                // std::cout << "message: " <<  message->get_username() << "\n";
                 auto message = shared_ptr<UsernameMessage>(new UsernameMessage());
                 message->deserialize(bodyBuffer);
                 return shared_ptr<_BNetMsg>(message);
@@ -29,10 +26,44 @@ public:
             }
             case NetMessageType::PASSWORD:
             {
-                // std::cout << "PASSWORD\n";
                 auto message = shared_ptr<PasswordMessage>(new PasswordMessage());
                 message->deserialize(bodyBuffer);
                 return shared_ptr<_BNetMsg>(message);   
+                break;
+            }
+            case NetMessageType::DOWNLOAD_FILE:
+            {
+                auto message = shared_ptr<DownloadFileMessage>(new DownloadFileMessage());
+                message->deserialize(bodyBuffer);
+                return shared_ptr<_BNetMsg>(message);
+                break;
+            }
+            case NetMessageType::UPLOAD_FILE:
+            {
+                auto message = shared_ptr<UploadFileMessage>(new UploadFileMessage());
+                message->deserialize(bodyBuffer);
+                return shared_ptr<_BNetMsg>(message);
+                break;
+            }
+            case NetMessageType::HELP_CONTENT:
+            {
+                auto message = shared_ptr<HelpContentMessage>(new HelpContentMessage());
+                message->deserialize(bodyBuffer);
+                return shared_ptr<_BNetMsg>(message);
+                break;
+            }
+            case NetMessageType::FILE_CONTENT:
+            {
+                auto message = shared_ptr<FileContentMessage>(new FileContentMessage());
+                message->deserialize(bodyBuffer);
+                return shared_ptr<_BNetMsg>(message);
+                break;
+            }
+            case NetMessageType::QUIT:
+            {
+                auto message = shared_ptr<QuitMessage>(new QuitMessage());
+                message->deserialize(bodyBuffer);
+                return shared_ptr<_BNetMsg>(message);
                 break;
             }
             default:

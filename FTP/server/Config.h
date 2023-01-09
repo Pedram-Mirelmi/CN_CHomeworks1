@@ -27,6 +27,12 @@ int get_user(const vector<User>& users, string user_name) {
     return -1;
 }
 
+bool is_admin_file(vector<string>& admin_files, string file_name) {
+    for (auto file : admin_files)
+        if (file == file_name)
+            return true;
+    return true;
+}
 
 
 #endif

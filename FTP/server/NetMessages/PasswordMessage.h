@@ -3,7 +3,6 @@
 #include <cstring>
 
 #include "../AsyncServerFramework/io/BasicNetMessage.h"
-// #include "./FTP-Message-types.h"
 #include "../NetMessageTypes.h"
 #include "../typedefs.hpp"
 
@@ -23,14 +22,12 @@ public:
 
     void deserialize(char *buffer) override
     {
-        m_header.deserialize(buffer);
-        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
-
+        std::cout << "password: " << buffer << endl;
         _passwordSize_T passwordSize;
         ISerializable::deserializePrimitiveType<_passwordSize_T>(buffer, passwordSize);
 
         m_password.resize(passwordSize);
-        ISerializable::serializeByteArray(buffer, m_password.data(), passwordSize, true);
+        ISerializable::deserializeByteArray(buffer, m_password.data(), passwordSize, true);
     }
     void serialize(char *buffer) const override
     {

@@ -13,7 +13,7 @@ protected:
     // ISerializable interface
 public:
     FileContentMessage() = default;
-    FileContentMessage(std::vector<char>&& content)
+    FileContentMessage(std::vector<char>& content)
         :_BNetMsg(NetMessageType::FILE_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize()),
          m_fileContent(std::move(content))
     {}
@@ -43,6 +43,10 @@ public:
         return NetMessageHeader<NetMessageType>::getHeaderSize()
                + sizeof(_fileSize_T)
                + m_fileContent.size();
+    }
+
+    std::vector<char> get_file_content() {
+        return this->m_fileContent;
     }
 
     // BasicNetMessage interface

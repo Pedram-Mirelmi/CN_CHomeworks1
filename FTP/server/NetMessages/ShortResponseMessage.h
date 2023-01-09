@@ -21,9 +21,6 @@ public:
 
     void deserialize(char *buffer) override
     {
-        m_header.deserialize(buffer);
-        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
-
         ISerializable::deserializePrimitiveType<_responseNum_T>(buffer, m_responseNumber, false);
     }
 

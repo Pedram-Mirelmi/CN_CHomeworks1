@@ -21,9 +21,6 @@ public:
 
     void deserialize(char *buffer) override
     {
-        m_header.deserialize(buffer);
-        buffer += _Header::getHeaderSize();
-
         uint8_t usernameSize;
         ISerializable::deserializePrimitiveType<uint8_t>(buffer, usernameSize);
         m_username.resize(usernameSize);

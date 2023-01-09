@@ -2,10 +2,12 @@
 #include <asio.hpp>
 #include <iostream>
 #include <mutex>
+#include <cctype>
 
 #include "io/BasicNetMessage.h"
 #include "./io/BasicNetMessage.h"
 #include "Config.h"
+
 
 using std::string;
 
@@ -18,6 +20,8 @@ class Session : public std::enable_shared_from_this<Session<MsgType>>
     User user;
     bool is_user_name_set = false;
     bool is_authenticated = false;
+    bool next_upload = false;               // next message is upload
+    string file_name;                       // file to upload name
 
 
     socket m_socket;
@@ -67,13 +71,23 @@ public:
     }
 
     // user information functions
+    bool is_autherized() {
+        return this->is_authenticated;
+    }
 
     void set_user(User& user) {
         this->user = user;
         this->is_user_name_set = true;
     }
 
+    bool is_admin() {
+        if(this->is_authenticated) 
+            return this->user.is_admin;
+        return false;
+    }
+
     bool check_password(const string password) {
+
         if(this->user.password == password) {
             this->is_authenticated = true;
             return true;
@@ -84,8 +98,20 @@ public:
     bool quit() {
         this->is_authenticated = false;
         this->is_user_name_set = false;
-        this->user = NULL;
+        this->want_to_upload = false;
     }   
+
+    void set_next_upload(){
+        this->next_upload = true;
+    }
+
+    string get_file_name() {
+        return this->file_name;
+    }
+
+    bool can_upload() {
+        return this->next_upload;
+    }
 
 };
 
