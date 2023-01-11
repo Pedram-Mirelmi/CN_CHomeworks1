@@ -6,7 +6,7 @@ using namespace std;
 void runClient()
 {
     using namespace std;
-    NetworkHandler networkHandler("127.0.0.1", 16000);
+    NetworkHandler networkHandler("127.0.0.1", 8000);
     networkHandler.start();
     while (true)
     {
