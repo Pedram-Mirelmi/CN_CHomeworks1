@@ -16,9 +16,11 @@ protected:
 public:
     UsernameMessage() = default;
     UsernameMessage(const std::string& username)
-        :_BNetMsg(FTPMessageType::USERNAME, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        :_BNetMsg(),
          m_username(username)
-    {}
+    {
+        m_header = _Header(FTPMessageType::USERNAME, calculateNeededSizeForThis() - _Header::getHeaderSize());
+    }
 
     void deserialize(char *buffer) override
     {

@@ -17,9 +17,11 @@ protected:
 public:
     DownloadFileMessage() = default;
     DownloadFileMessage(const std::string& filename)
-        : _BNetMsg(FTPMessageType::DOWNLOAD_FILE, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        : _BNetMsg(),
           m_filename(filename)
-    {}
+    {
+        m_header = _Header(FTPMessageType::DOWNLOAD_FILE, calculateNeededSizeForThis() - _Header::getHeaderSize());
+    }
 
     void deserialize(char *buffer) override
     {

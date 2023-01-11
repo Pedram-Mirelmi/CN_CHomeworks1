@@ -17,9 +17,11 @@ protected:
 public:
     PasswordMessage() = default;
     PasswordMessage(const std::string& password)
-        : _BNetMsg(FTPMessageType::PASSWORD, password.size()),
+        : _BNetMsg(),
           m_password(password)
-    {}
+    {
+        m_header = _Header(FTPMessageType::PASSWORD, calculateNeededSizeForThis() - _Header::getHeaderSize());
+    }
 
     void deserialize(char *buffer) override
     {

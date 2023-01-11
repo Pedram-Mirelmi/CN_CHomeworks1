@@ -18,9 +18,11 @@ protected:
 public:
     UploadFileMessage() = default;
     UploadFileMessage(const std::string& filename)
-        : _BNetMsg(FTPMessageType::UPLOAD_FILE, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        : _BNetMsg(),
           m_filename(filename)
-    {}
+    {
+        m_header = _Header(FTPMessageType::UPLOAD_FILE, calculateNeededSizeForThis() - _Header::getHeaderSize());
+    }
 
     void deserialize(char *buffer) override
     {
