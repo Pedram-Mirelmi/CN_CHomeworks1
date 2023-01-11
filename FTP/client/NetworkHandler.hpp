@@ -81,9 +81,9 @@ protected:
 
 
 public:
-    void addPendingFile(std::string&& filename)
+    void addPendingFile(const std::string& filename)
     {
-        m_responseResolver->addPendingdDownloadFile(std::move(filename));
+        m_responseResolver->addPendingdDownloadFile(filename);
     }
     void closeConnection()
     {
@@ -107,6 +107,7 @@ public:
     {
         DownloadFileMessage* filenameMsg = new DownloadFileMessage(filename);
         shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(filenameMsg));
+        addPendingFile(std::move(filename));
         writeMessage(msg);
     }
 

@@ -72,7 +72,7 @@ public:
         }
     }
 public:
-    void addPendingdDownloadFile(std::string&& filename) override
+    void addPendingdDownloadFile(const std::string& filename) override
     {
         std::scoped_lock<std::mutex> scopedLock(m_queuesLock);
         m_pendingDownloadFiles.push(std::move(filename));
@@ -141,13 +141,17 @@ private:
     }
     void handleFileContent(FileContentMessage* msg)
     {
-        std::cout << "File(" << m_pendingDownloadFiles.front() << ") downloaded completely, what would you like to name it?(press enter to use the default name) ";
-        std::string filename;
-        getline(std::cin, filename);
-        filename = filename == "" ? m_pendingDownloadFiles.front() : filename;
-        std::ofstream file(std::string("./") + filename, std::ios::binary);
-        file.write(msg->getFileContent().data(), msg->getFileContent().size());
-        file.close();
+        std::string filename = m_pendingDownloadFiles.front();
+        std::ofstream file(filename);
+        if(file)
+        {
+            file.write(msg->getFileContent().data(), msg->getFileContent().size());
+            file.close();
+        }
+        else
+        {
+            std::cout << "file downloaded but couldn't save it to " << filename << std::endl;
+        }
         m_pendingDownloadFiles.pop();
     }
 
