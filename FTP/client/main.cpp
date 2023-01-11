@@ -1,4 +1,5 @@
 #include "NetworkHandler.hpp"
+#include "ResponseHandler.hpp"
 using namespace std;
 
 
@@ -7,6 +8,7 @@ void runClient()
 {
     using namespace std;
     NetworkHandler networkHandler("127.0.0.1", 8000);
+    networkHandler.setResponseResolver(shared_ptr<IResponseResolver>(static_cast<IResponseResolver*>(new ResponseHandler)));
     networkHandler.start();
     while (true)
     {

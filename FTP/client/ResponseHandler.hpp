@@ -6,7 +6,7 @@
 #include <mutex>
 #include "./IResponseResolver.h"
 #include "./NetMessages/AllNetMessages.hpp"
-class ResponseHandler : IResponseResolver
+class ResponseHandler : public IResponseResolver
 {
     std::mutex m_queuesLock;
     std::queue<std::string> m_pendingDownloadFiles, m_pendingUploadFiles;

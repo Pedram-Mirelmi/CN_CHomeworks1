@@ -132,4 +132,10 @@ public:
     }
 
 
+    void setResponseResolver(const shared_ptr<IResponseResolver> &newResponseResolver)
+    {
+        m_responseResolver = newResponseResolver;
+    }
 };
+
+
