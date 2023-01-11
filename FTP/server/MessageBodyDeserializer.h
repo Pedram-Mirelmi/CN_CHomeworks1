@@ -14,7 +14,6 @@ public:
 public:
     virtual shared_ptr<NetMessage<NetMessageType>> deserializeBody(NetMessageHeader<NetMessageType> header, char *bodyBuffer) override
     {
-        // std::cout << "message type is: ";
         switch (header.getMessageType())
         {
             case NetMessageType::USERNAME:
@@ -45,10 +44,9 @@ public:
                 return shared_ptr<_BNetMsg>(message);
                 break;
             }
-            case NetMessageType::HELP_CONTENT:
+            case NetMessageType::GET_HELP:
             {
-                auto message = shared_ptr<HelpContentMessage>(new HelpContentMessage());
-                message->deserialize(bodyBuffer);
+                auto message = shared_ptr<GetHelpMessage>(new GetHelpMessage());
                 return shared_ptr<_BNetMsg>(message);
                 break;
             }

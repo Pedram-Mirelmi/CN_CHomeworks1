@@ -119,7 +119,7 @@ private:
             case 225: // additional short response. server states that the client the permission to upload file
                 cout << responseNumber << ": Server allowed uploading..." << "\n>>" << flush;
                 break;
-            case 223:
+            case 332:
                 cout << responseNumber << ": Need account for login" << "\n>>" << flush;
                 break;
             case 551:

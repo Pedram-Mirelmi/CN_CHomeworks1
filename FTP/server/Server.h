@@ -134,10 +134,8 @@ public:
             }
         }
         else {
-
             switch (msg_type)
             {
-                
                 case NetMessageType::DOWNLOAD_FILE:
                 {
                     std::cout << "  [MESSAGE TYPE] DOWNLOAD: ";
@@ -205,11 +203,12 @@ public:
 
 
                 }
-                case NetMessageType::HELP_CONTENT:
+                case NetMessageType::GET_HELP:
                 {
-                    std::cout << "  [MESSGAE TYPE] HELP_CONTENT\n";
-                    auto newNetMsg = std::dynamic_pointer_cast<HelpContentMessage>(netMsg);
+                    std::cout << "  [MESSGAE TYPE] GET_HELP\n";
                     HelpContentMessage* help = new HelpContentMessage();
+                    string mes_help = "content of help message";
+                    help->serialize(mes_help.data());
                     shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(help));
                     this->m_netIoManager.writeMessage(msg ,session);
                     break;
