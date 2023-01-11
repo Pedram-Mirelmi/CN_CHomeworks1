@@ -49,8 +49,13 @@ public:
 
     // BasicNetMessage interface
 public:
-    const FTPMessageType &getMessageType() const override
+    FTPMessageType getMessageType() const override
     {
         return FTPMessageType::FILE_CONTENT;
+    }
+public:
+    const std::vector<char>& getFileContent() const
+    {
+        return m_fileContent;
     }
 };

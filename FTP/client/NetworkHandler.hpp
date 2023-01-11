@@ -1,12 +1,12 @@
 #pragma once
+#include <iostream>
 
 #include "./AsyncNetFramework/AbstractNetIOManager.h"
 #include "NetMessages/FTP-Message-types.h"
 #include "./NetMessages/AllNetMessages.hpp"
 #include "./IResponseResolver.h"
-#include <iostream>
 
-class NetworkHandler : AbstractNetIOManager<FTPMessageType>
+class NetworkHandler : public AbstractNetIOManager<FTPMessageType>
 {
 public:
     NetworkHandler(const std::string& ip, uint16_t port)
@@ -17,7 +17,7 @@ public:
 private:
     shared_ptr<IResponseResolver> m_responseResolver;
 protected:
-    void onNewMessageReadCompletely()
+    void onNewMessageReadCompletely() override
     {
         shared_ptr<BasicNetMessage<FTPMessageType>> msg;
         switch (m_tempHeader.getMessageType())
@@ -75,11 +75,20 @@ protected:
 
     void onDisconnected() override
     {
+        AbstractNetIOManager::onDisconnected();
         std::cout << "disconnected from server!" << std::endl;
     }
 
 
 public:
+    void addPendingFile(std::string&& filename)
+    {
+        m_responseResolver->addPendingdDownloadFile(std::move(filename));
+    }
+    void closeConnection()
+    {
+        m_socket.close();
+    }
     void sendUsername(const std::string& username)
     {
         UsernameMessage* usernameMsg = new UsernameMessage(username);

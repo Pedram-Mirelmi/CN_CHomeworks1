@@ -11,6 +11,7 @@ SUBDIRS += \
 
 HEADERS += \
     AsyncNetFramework/AbstractNetIOManager.h \
+    AsyncNetFramework/INetWriter.h \
     AsyncNetFramework/IService.h \
     AsyncNetFramework/io/BasicNetMessage.h \
     AsyncNetFramework/io/ISerializable.h \

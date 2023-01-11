@@ -2,8 +2,11 @@
 
 #include <asio.hpp>
 #include <string>
+#include <iostream>
 #include "./IService.h"
 #include "./io/BasicNetMessage.h"
+#include "./INetWriter.h"
+
 
 using std::shared_ptr;
 using std::make_shared;
@@ -11,6 +14,7 @@ using std::make_shared;
 
 template<typename MsgType>
 class AbstractNetIOManager : public IService,
+                             public INetWriter<MsgType>,
                              public std::enable_shared_from_this<AbstractNetIOManager<MsgType>>
 {
     using socket = asio::ip::tcp::socket;
@@ -30,7 +34,10 @@ protected:
 
 public:
     AbstractNetIOManager(const string& ip, uint16_t port)
-        : IService(), m_socket(m_ioContext)
+        : IService(),
+          INetWriter<MsgType> (),
+          std::enable_shared_from_this<AbstractNetIOManager>(),
+          m_socket(m_ioContext)
     {
         m_headerInBuffer.resize(NetMessageHeader<MsgType>::getHeaderSize());
         asio::ip::tcp::resolver resolver(m_ioContext);
@@ -45,6 +52,7 @@ protected:
     {
         if(!ec)
         {
+            std::cout << "Connected to " << endPoint << std::endl;
             m_isConnected = true;
             asio::async_read(m_socket,
                              asio::buffer(m_headerInBuffer.data(), NetMessageHeader<MsgType>::getHeaderSize()),
@@ -120,10 +128,13 @@ protected:
 
     virtual void onNewMessageReadCompletely() = 0;
 
-    virtual void onDisconnected() = 0;
+    virtual void onDisconnected()
+    {
+        m_isConnected = false;
+    };
 
 public:
-    virtual void writeMessage(shared_ptr<BasicNetMessage<MsgType>> msg)
+    virtual void writeMessage(shared_ptr<BasicNetMessage<MsgType>> msg) override
     {
         uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
         char* msgBuffer = new char[msgSize];
@@ -140,7 +151,7 @@ public:
 
     // IService interface
 public:
-    virtual void start() override
+    virtual void connectToServer()
     {
         asio::async_connect(m_socket,
                             m_endPoints,
@@ -149,13 +160,19 @@ public:
                                       std::placeholders::_1,
                                       std::placeholders::_2)
                             );
+    }
+
+    virtual void start() override
+    {
+        connectToServer();
+
         m_asioThread = std::thread([=](){m_ioContext.run();});
 
     }
     virtual void stop() override
     {
-        m_ioContext.stop();
         m_socket.close();
+        m_ioContext.stop();
         if(m_asioThread.joinable())
             m_asioThread.join();
     }

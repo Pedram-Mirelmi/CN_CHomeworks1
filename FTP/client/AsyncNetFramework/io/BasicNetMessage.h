@@ -71,7 +71,7 @@ public:
         :m_header(msgType, bodySize)
     {}
 
-    virtual const MsgType& getMessageType() const = 0;
+    virtual MsgType getMessageType() const = 0;
 
     const NetMessageHeader<MsgType> &getHeader() const
     {
