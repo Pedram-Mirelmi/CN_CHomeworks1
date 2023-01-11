@@ -7,7 +7,9 @@
 #include "./NetIOManager.h"
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <Config.h>
+
 
 using std::string;
 
@@ -36,15 +38,19 @@ public:
 
 private:
 
+    bool file_exist(const string& file_path) {
+        std::filesystem::path f{file_path};
+        if (std::filesystem::exists(f))
+            return true;
+        return false;
+    }
+
     std::vector<char> read_whole_file(const string& path) {
         std::ifstream input_file(path);
         if (!input_file.is_open())
             exit(EXIT_FAILURE);
         string s = string((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
         std::vector<char> v(s.begin(), s.end());
-        for (const char &c: v) {
-            std::cout << c;
-        }
         input_file.close();
         return v;
     }
@@ -80,47 +86,47 @@ public:
                                     shared_ptr<Session<NetMessageType>> session) override
     {
 
-        std::cout << "processNetMessage: \n";
+        std::cout << "[INFO] User \"" << session->get_client_port() << "\" send a message:\n";
         if (session->is_autherized() == false){
             switch (msg_type)
             {
                 case NetMessageType::USERNAME:
                 {
-                    std::cout << "USERNAME: ";
+                    std::cout << "  [MESSAGE TYPE] USERNAME: ";
                     auto newNetMsg = std::dynamic_pointer_cast<UsernameMessage>(netMsg);
                     string username = newNetMsg->get_username();
                     int id = get_user(config.users, username);
                     std::cout << username << '\n';
                     if (id == -1){
                         write_short_response(430, session);
-                        std::cout << "User not exist\n";
+                        std::cout << "  [ERROR] User not exist\n";
                     }
                     else{
                         session->set_user(config.users[id]);
                         write_short_response(331, session);
-                        std::cout << "User found\n";
+                        std::cout << "  [INFO] User found\n";
                     }
                     break;
                 }
                 case NetMessageType::PASSWORD:
                 {
-                    std::cout << "PSSWORD: ";
+                    std::cout << "  [MESSAGE TYPE] PSSWORD: ";
                     auto newNetMsg = std::dynamic_pointer_cast<PasswordMessage>(netMsg);
                     string password = newNetMsg->get_password();
                     std::cout << password << '\n';
                     if (session->check_password(password)) {
                         write_short_response(230, session);
-                        std::cout << "user loged in\n";
+                        std::cout << "  [INFO] User loged in\n";
                     }
                     else{
                         write_short_response(430, session);
-                        std::cout << "wrong password\n";
+                        std::cout << "  [ERROR] wrong password\n";
                     }
                     break;
                 }
                 default:
             {
-                cout << "Message type not support\n";
+                cout << "[ERROR] Message type not support\n";
                 write_short_response(332, session);
                 return;
                 break;
@@ -134,35 +140,46 @@ public:
                 
                 case NetMessageType::DOWNLOAD_FILE:
                 {
-                    std::cout << "DOWNLOAD\n";
+                    std::cout << "  [MESSAGE TYPE] DOWNLOAD: ";
                     auto newNetMsg = std::dynamic_pointer_cast<DownloadFileMessage>(netMsg);
                     string file_name = newNetMsg->get_file_name();
-                    if (is_admin_file(config.admin_files, file_name)) {
-                        if(session->is_admin()){
-                            std::vector<char> whole_file = read_whole_file(file_name);
-                            FileContentMessage* file_content = new FileContentMessage(whole_file);
-                            shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(file_content));
-                            this->m_netIoManager.writeMessage(msg ,session);
-                            write_short_response(226, session);
-                        }
-                        else{
-                            write_short_response(550, session);
-                        }
+                    string file_path = "./Files/" + file_name;
+                    std::cout << file_name << endl;
+
+                    if (file_exist(file_path) == false){
+                        std::cout << "  [ERROR] File not exists\n";
+                        write_short_response(500, session);
+                        return;
                     }
-                    else {
-                        std::vector<char> whole_file = read_whole_file(file_name);
-                        FileContentMessage* file_content = new FileContentMessage(whole_file);
-                        shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(file_content));
-                        this->m_netIoManager.writeMessage(msg ,session);
-                        write_short_response(226, session);
+                    
+                    if (is_admin_file(config.admin_files, file_name) and !session->is_admin()) {
+                        std::cout << "  [ERROR] Only admin can download this file\n";
+                        write_short_response(550, session);
+                        return;
                     }
+
+
+                    // send file
+                    std::vector<char> whole_file = read_whole_file(file_path);
+                    std::cout << "  [INFO] File size is : " << whole_file.size() << " KB\n";
+                    if (!session->download(whole_file.size())){
+                        std::cout << "  [ERROR] Don't have enough data to download!\n";
+                        write_short_response(425, session);
+                        return;
+                    }
+                    std::cout << "  [INFO] Sending file ... \n";
+                    FileContentMessage* file_content = new FileContentMessage(whole_file);
+                    shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(file_content));
+                    this->m_netIoManager.writeMessage(msg ,session);
+                    write_short_response(226, session);
                     break;
                 }
                 case NetMessageType::UPLOAD_FILE:
                 {
-                    std::cout << "UPLOAD_FILE\n";
+                    std::cout << "  [MESSAGE TYPE] UPLOAD_FILE: ";
                     auto newNetMsg = std::dynamic_pointer_cast<UploadFileMessage>(netMsg);
                     string file_name = newNetMsg->get_file_name();
+                    std::cout << file_name << endl;
                     if(session->is_admin()) {
                         write_short_response(226, session);
                         session->set_next_upload();
@@ -174,7 +191,7 @@ public:
                 }
                 case NetMessageType::FILE_CONTENT:
                 {
-                    std::cout << "FILE_CONTENT\n";
+                    std::cout << "  [MESSAGE TYPE] FILE_CONTENT\n";
                     auto newNetMsg = std::dynamic_pointer_cast<FileContentMessage>(netMsg);
                     std::vector<char> file_content = newNetMsg->get_file_content();
                     if (session->can_upload()) {
@@ -190,7 +207,7 @@ public:
                 }
                 case NetMessageType::HELP_CONTENT:
                 {
-                    std::cout << "HELP_CONTENT\n";
+                    std::cout << "  [MESSGAE TYPE] HELP_CONTENT\n";
                     auto newNetMsg = std::dynamic_pointer_cast<HelpContentMessage>(netMsg);
                     HelpContentMessage* help = new HelpContentMessage();
                     shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(help));
@@ -199,14 +216,14 @@ public:
                 }
                 case NetMessageType::QUIT:
                 {
-                    std::cout << "QUIT\n";
+                    std::cout << "  [MESSAGE TYPE] QUIT\n";
                     write_short_response(221, session);
                     break;
                 }
                 
                 default:
                 {
-                    cout << "Message type not support or user want to login again\n";
+                    cout << "   [ERROR] Message type not support or user want to login again\n";
                     write_short_response(500, session);
                     break;
                 }

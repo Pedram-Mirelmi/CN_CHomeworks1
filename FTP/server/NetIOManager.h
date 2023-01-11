@@ -27,7 +27,7 @@ protected:
     void onConnectionClosedByClient(std::error_code ec, shared_ptr<Session<NetMessageType>> session)  override
     {
         // TODO log the closure
-        std::cout << "connection closed\n";
+        std::cout << "[INFO] Connection closed on port \"" << session->get_client_port() << "\"\n" ;
     }
     void onNewMessageReadCompletely(shared_ptr<Session<NetMessageType>> session) override
     {
@@ -43,7 +43,7 @@ protected:
     void onNewConnectionAccepted(shared_ptr<Session<NetMessageType> > newConnection) override
     {
         // TODO log the new connection
-        std::cout << "new connection accepted\n";
+        std::cout << "[INFO] New Connection on port \"" << newConnection->get_client_port() << "\"\n" ;
     }
 };
 

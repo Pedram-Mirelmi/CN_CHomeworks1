@@ -23,7 +23,6 @@ class Session : public std::enable_shared_from_this<Session<MsgType>>
     bool next_upload = false;               // next message is upload
     string file_name;                       // file to upload name
 
-
     socket m_socket;
     std::vector<char> m_headerInBuffer;
     std::vector<char> m_bodyInBuffer;
@@ -111,6 +110,18 @@ public:
 
     bool can_upload() {
         return this->next_upload;
+    }
+
+    bool download(int size) {
+        if (this->user.remain_storage > size) {
+            this->user.remain_storage -= size;
+            return true;                            // download
+        }       
+        return false;                               // don't download
+    }
+
+    int get_client_port() {
+        return m_socket.remote_endpoint().port();
     }
 
 };

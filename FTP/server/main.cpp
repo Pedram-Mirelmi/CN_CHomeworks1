@@ -55,8 +55,8 @@ int main()
 {
     
     Config config = init_config("./Files/config.json");
-    cout << "[Read]: config.json\n";
-    cout << "[Started]: Server on port (" << config.port << ") ...\n";
+    cout << "[INFO]: Read config: config.json\n";
+    cout << "[INFO]: Started Server on port \"" << config.port << "\"\n";
     startServer(config);
 
 
