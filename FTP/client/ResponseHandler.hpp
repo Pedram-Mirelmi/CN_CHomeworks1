@@ -93,46 +93,46 @@ private:
         using namespace std;
         switch (responseNumber) {
             case 331: // username ok, need password
-                cout << responseNumber << ": Username Okay, need password." << endl;
+                cout << responseNumber << ": Username Okay, need password." << "\n>>" << flush;
                 break;
             case 503:
-                cout << responseNumber << ": Bad sequence of commands" << endl;
+                cout << responseNumber << ": Bad sequence of commands" << "\n>>" << flush;
                 break;
             case 230:
-                cout << responseNumber << ": User logged in, proceed. Logged out if appropriate" << endl;
+                cout << responseNumber << ": User logged in, proceed. Logged out if appropriate" << "\n>>" << flush;
                 break;
             case 430:
-                cout << responseNumber << ": Invalid username of password" << endl;
+                cout << responseNumber << ": Invalid username of password" << "\n>>" << flush;
                 break;
             case 550:
-                cout << responseNumber << ": file unavailable" << endl;
+                cout << responseNumber << ": file unavailable" << "\n>>" << flush;
                 break;
             case 226:
-                cout << responseNumber << ": Successful Download" << endl;
+                cout << responseNumber << ": Successful Download" << "\n>>" << flush;
                 break;
             case 221:
-                cout << responseNumber << ": Successful Quit." << endl;
+                cout << responseNumber << ": Successful Quit." << "\n>>" << flush;
                 break;
             case 224: // additional short response. server states that file is available and will send it right away
-                cout << responseNumber << ": File found!" << endl;
+                cout << responseNumber << ": File found!" << "\n>>" << flush;
                 break;
             case 225: // additional short response. server states that the client the permission to upload file
-                cout << responseNumber << ": Server allowed uploading..." << endl;
+                cout << responseNumber << ": Server allowed uploading..." << "\n>>" << flush;
                 break;
             case 223:
-                cout << responseNumber << ": Need account for login" << endl;
+                cout << responseNumber << ": Need account for login" << "\n>>" << flush;
                 break;
             case 551:
-                cout << responseNumber << ": Syntax error in parameters or arguments" << endl;
+                cout << responseNumber << ": Syntax error in parameters or arguments" << "\n>>" << flush;
                 break;
             case 425:
-                cout << responseNumber << ": Can't open data connectioin" << endl;
+                cout << responseNumber << ": Can't open data connectioin" << "\n>>" << flush;
                 break;
             case 403: // addiotional: when a user tries to upload but doesn't have permission to do so
-                cout << responseNumber << ": Permissoin denied!" << endl;
+                cout << responseNumber << ": Permissoin denied!" << "\n>>" << flush;
                 break;
             case 500:
-                cout << responseNumber << ": Error" << endl;
+                cout << responseNumber << ": Error" << "\n>>" << flush;
                 break;
             default:
                 throw runtime_error(std::string("Unknown response number: ") + to_string(responseNumber));
@@ -150,7 +150,7 @@ private:
         }
         else
         {
-            std::cout << "file downloaded but couldn't save it to " << filename << std::endl;
+            std::cout << "file downloaded but couldn't save it to " << filename << "\n>>" << std::endl;
         }
         m_pendingDownloadFiles.pop();
     }

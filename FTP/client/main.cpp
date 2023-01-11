@@ -13,7 +13,6 @@ void runClient()
     while (true)
     {
         string line;
-        std::cout << ">>";
         getline(cin, line);
         stringstream ss(line);
         string command;

@@ -3,10 +3,11 @@
 #include <asio.hpp>
 #include <string>
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include "./IService.h"
 #include "./io/BasicNetMessage.h"
 #include "./INetWriter.h"
-
 
 using std::shared_ptr;
 using std::make_shared;
@@ -52,7 +53,7 @@ protected:
     {
         if(!ec)
         {
-            std::cout << "Connected to " << endPoint << std::endl;
+            std::cout << "Connected to " << endPoint << "\n>>" << std::flush;
             m_isConnected = true;
             asio::async_read(m_socket,
                              asio::buffer(m_headerInBuffer.data(), NetMessageHeader<MsgType>::getHeaderSize()),
@@ -64,6 +65,12 @@ protected:
 
 
 
+        }
+        else
+        {
+            std::cout << "Couldn't connect: " << ec.message() << ". Trying again ..." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            connectToServer();
         }
     }
 
