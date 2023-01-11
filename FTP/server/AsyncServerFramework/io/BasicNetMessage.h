@@ -72,15 +72,12 @@ protected:
 public:
     virtual const MsgType& getMessageType() const = 0;
     const MsgType& getMessageType() {
-        std::cout << "get message default called\n";
         return this->m_header.getMessageType();
     }
     NetMessage() = default;
     NetMessage(MsgType msgType, uint32_t bodySize)
         :m_header(msgType, bodySize)
-    {
-        std::cout << "set net message type ......\n";
-    }
+    {}
     const NetMessageHeader<MsgType> &getHeader() const
     {
         return m_header;

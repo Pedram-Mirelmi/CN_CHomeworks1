@@ -55,4 +55,9 @@ public:
     {
         return NetMessageType::FILE_CONTENT;
     }
+public:
+    const std::vector<char>& getFileContent() const
+    {
+        return m_fileContent;
+    }
 };

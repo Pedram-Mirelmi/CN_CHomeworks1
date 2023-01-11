@@ -48,4 +48,10 @@ public:
     {
         return NetMessageType::HELP_CONTENT;
     }
+    const std::string &getHelpContent() const
+    {
+        return m_helpContent;
+    }
 };
+
+
