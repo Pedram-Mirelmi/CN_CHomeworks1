@@ -92,12 +92,12 @@ public:
                     int id = get_user(config.users, username);
                     std::cout << username << '\n';
                     if (id == -1){
-                        // write_short_response(430, session);
+                        write_short_response(430, session);
                         std::cout << "User not exist\n";
                     }
                     else{
                         session->set_user(config.users[id]);
-                        // write_short_response(331, session);
+                        write_short_response(331, session);
                         std::cout << "User found\n";
                     }
                     break;
@@ -109,11 +109,11 @@ public:
                     string password = newNetMsg->get_password();
                     std::cout << password << '\n';
                     if (session->check_password(password)) {
-                        // write_short_response(230, session);
+                        write_short_response(230, session);
                         std::cout << "user loged in\n";
                     }
                     else{
-                        // write_short_response(430, session);
+                        write_short_response(430, session);
                         std::cout << "wrong password\n";
                     }
                     break;
