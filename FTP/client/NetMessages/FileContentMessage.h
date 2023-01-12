@@ -16,9 +16,11 @@ protected:
 public:
     FileContentMessage() = default;
     FileContentMessage(std::vector<char>&& content)
-        :_BNetMsg(FTPMessageType::FILE_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        :_BNetMsg(),
          m_fileContent(std::move(content))
-    {}
+    {
+        m_header = _Header(FTPMessageType::FILE_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize());
+    }
 public:
     void deserialize(char *buffer) override
     {

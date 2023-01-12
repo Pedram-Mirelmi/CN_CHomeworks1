@@ -7,9 +7,12 @@ using namespace std;
 void runClient()
 {
     using namespace std;
-    NetworkHandler networkHandler("127.0.0.1", 8000);
-    networkHandler.setResponseResolver(shared_ptr<IResponseResolver>(static_cast<IResponseResolver*>(new ResponseHandler)));
-    networkHandler.start();
+    auto networkHandler = make_shared<NetworkHandler>("127.0.0.1", 8000);
+    auto responseResolver = new ResponseHandler;
+    responseResolver->setNetWriter(networkHandler);
+    networkHandler->setResponseResolver(shared_ptr<IResponseResolver>(responseResolver));
+
+    networkHandler->start();
     while (true)
     {
         string line;
@@ -21,34 +24,38 @@ void runClient()
         {
             string username;
             ss >> username;
-            networkHandler.sendUsername(username);
+            networkHandler->sendUsername(username);
         }
         else if (command == "pass")
         {
             string password;
             ss >> password;
-            networkHandler.sendPassword(password);
+            networkHandler->sendPassword(password);
         }
         else if (command == "retr")
         {
             string filename;
             ss >> filename;
-            networkHandler.sendRetr(filename);
+            networkHandler->sendRetr(filename);
         }
         else if(command == "Upload")
         {
             string filename;
             ss >> filename;
-            networkHandler.sendUpload(filename);
+            networkHandler->sendUpload(filename);
         }
         else if(command == "help")
         {
-            networkHandler.sendGetHelp();
+            networkHandler->sendGetHelp();
         }
         else if(command == "quit")
         {
-            networkHandler.sendQuit();
-            networkHandler.closeConnection();
+            networkHandler->sendQuit();
+            networkHandler->closeConnection();
+        }
+        else if(command == "connect")
+        {
+            networkHandler->connectToServer();
         }
         else
         {

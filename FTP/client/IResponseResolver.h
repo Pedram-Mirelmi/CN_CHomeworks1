@@ -8,5 +8,5 @@ class IResponseResolver
 public:
     virtual void resolveResponse(shared_ptr<BasicNetMessage<FTPMessageType>> response) = 0;
     virtual void addPendingdDownloadFile(const std::string& filename) = 0;
-    virtual void addPendingUploadFile(std::string&& filename) = 0;
+    virtual void addPendingUploadFile(const std::string& filename) = 0;
 };

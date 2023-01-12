@@ -66,7 +66,7 @@ public:
             case FTPMessageType::HELP_CONTENT:
             {
                 auto helpContentMsg = (HelpContentMessage*) msg.get();
-                std::cout << helpContentMsg->getHelpContent() << std::endl;
+                std::cout << helpContentMsg->getHelpContent() << "\n>>" << std::flush;
                 break;
             }
         }
@@ -77,7 +77,7 @@ public:
         std::scoped_lock<std::mutex> scopedLock(m_queuesLock);
         m_pendingDownloadFiles.push(std::move(filename));
     }
-    void addPendingUploadFile(std::string&& filename) override
+    void addPendingUploadFile(const std::string& filename) override
     {
         std::scoped_lock<std::mutex> scopedLock(m_queuesLock);
         m_pendingUploadFiles.push(filename);
@@ -110,6 +110,9 @@ private:
             case 226:
                 cout << responseNumber << ": Successful Download" << "\n>>" << flush;
                 break;
+            case 227:
+                cout << responseNumber << ": Successfull Upload" << "\n>>" << flush;
+                break;
             case 221:
                 cout << responseNumber << ": Successful Quit." << "\n>>" << flush;
                 break;
@@ -118,6 +121,7 @@ private:
                 break;
             case 225: // additional short response. server states that the client the permission to upload file
                 cout << responseNumber << ": Server allowed uploading..." << "\n>>" << flush;
+                uploadFile();
                 break;
             case 332:
                 cout << responseNumber << ": Need account for login" << "\n>>" << flush;

@@ -77,13 +77,18 @@ protected:
     {
         AbstractNetIOManager::onDisconnected();
         std::cout << "disconnected from server!" << std::endl;
+        m_isConnected = false;
     }
 
 
 public:
-    void addPendingFile(const std::string& filename)
+    void addPendingDownloadFile(const std::string& filename)
     {
         m_responseResolver->addPendingdDownloadFile(filename);
+    }
+    void addPendingUploadFile(const std::string& filename)
+    {
+        m_responseResolver->addPendingUploadFile(filename);
     }
     void closeConnection()
     {
@@ -107,13 +112,14 @@ public:
     {
         DownloadFileMessage* filenameMsg = new DownloadFileMessage(filename);
         shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(filenameMsg));
-        addPendingFile(std::move(filename));
+        addPendingDownloadFile(std::move(filename));
         writeMessage(msg);
     }
 
     void sendUpload(const std::string& filename)
     {
         UploadFileMessage* uploadMsg = new UploadFileMessage(filename);
+        addPendingUploadFile(filename);
         shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(uploadMsg));
         writeMessage(msg);
     }
