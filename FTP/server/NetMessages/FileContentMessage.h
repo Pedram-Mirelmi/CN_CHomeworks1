@@ -14,15 +14,14 @@ protected:
 public:
     FileContentMessage() = default;
     FileContentMessage(std::vector<char>& content)
-        :_BNetMsg(NetMessageType::FILE_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize()),
+        :_BNetMsg(),
          m_fileContent(std::move(content))
-    {}
+    {
+        m_header = _Header(NetMessageType::FILE_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize());
+    }
 public:
     void deserialize(char *buffer) override
     {
-        m_header.deserialize(buffer);
-        buffer += NetMessageHeader<NetMessageType>::getHeaderSize();
-
         _fileSize_T contentSize;
         ISerializable::deserializePrimitiveType<_fileSize_T>(buffer, contentSize);
 

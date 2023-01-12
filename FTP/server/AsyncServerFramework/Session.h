@@ -108,6 +108,11 @@ public:
         return this->file_name;
     }
 
+    void set_file_name(string filename)
+    {
+        this->file_name = filename;
+    }
+
     bool can_upload() {
         return this->next_upload;
     }

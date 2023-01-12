@@ -56,7 +56,7 @@ private:
     }
 
     void save_to_file(string file_name, std::vector<char> content) {
-        std::ofstream file (file_name);
+        std::ofstream file (string("./Files/") + file_name);
         for (char c : content)
             file << c;
         
@@ -124,13 +124,19 @@ public:
                     }
                     break;
                 }
+                case NetMessageType::QUIT:
+                {
+                    std::cout << "  [MESSAGE TYPE] QUIT\n";
+                    // write_short_response(221, session);
+                    break;
+                }
                 default:
-            {
-                cout << "[ERROR] Message type not support\n";
-                write_short_response(332, session);
-                return;
-                break;
-            }
+                {
+                    cout << "[ERROR] Message type not support\n";
+                    write_short_response(332, session);
+                    return;
+                    break;
+                }
             }
         }
         else {
@@ -146,7 +152,7 @@ public:
 
                     if (file_exist(file_path) == false){
                         std::cout << "  [ERROR] File not exists\n";
-                        write_short_response(500, session);
+                        write_short_response(550, session);
                         return;
                     }
                     
@@ -159,7 +165,7 @@ public:
 
                     // send file
                     std::vector<char> whole_file = read_whole_file(file_path);
-                    std::cout << "  [INFO] File size is : " << whole_file.size() << " KB\n";
+                    std::cout << "  [INFO] File size is : " << whole_file.size() << " B\n";
                     if (!session->download(whole_file.size())){
                         std::cout << "  [ERROR] Don't have enough data to download!\n";
                         write_short_response(425, session);
@@ -179,8 +185,9 @@ public:
                     string file_name = newNetMsg->get_file_name();
                     std::cout << file_name << endl;
                     if(session->is_admin()) {
-                        write_short_response(226, session);
+                        write_short_response(225, session);
                         session->set_next_upload();
+                        session->set_file_name(((UploadFileMessage*)(netMsg.get()))->get_file_name());
                     }
                     else {
                         write_short_response(500, session); // simple error
@@ -195,28 +202,27 @@ public:
                     if (session->can_upload()) {
                         string file_name = session->get_file_name();
                         save_to_file(file_name, file_content);
-                        write_short_response(226, session);
+                        write_short_response(227, session);
                     }
                     else {
                         write_short_response(500, session);
                     }
-
-
+                    break;
                 }
                 case NetMessageType::GET_HELP:
                 {
                     std::cout << "  [MESSGAE TYPE] GET_HELP\n";
-                    HelpContentMessage* help = new HelpContentMessage();
-                    string mes_help = "content of help message";
-                    help->serialize(mes_help.data());
-                    shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(help));
-                    this->m_netIoManager.writeMessage(msg ,session);
+                    shared_ptr<HelpContentMessage> help = make_shared<HelpContentMessage>();
+                    // string mes_help = "content of help message";
+                    // help->serialize(mes_help.data());
+                    // shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(help));
+                    this->m_netIoManager.writeMessage(help ,session);
                     break;
                 }
                 case NetMessageType::QUIT:
                 {
                     std::cout << "  [MESSAGE TYPE] QUIT\n";
-                    write_short_response(221, session);
+                    // write_short_response(221, session);
                     break;
                 }
                 

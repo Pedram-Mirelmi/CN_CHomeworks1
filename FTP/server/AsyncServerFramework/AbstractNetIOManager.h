@@ -137,7 +137,7 @@ protected:
 public:
     virtual void writeMessage(shared_ptr<NetMessage<MsgType>> msg, shared_ptr<Session<MsgType>> session) override
     {
-        uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
+        uint32_t msgSize = msg->calculateNeededSizeForThis();
         char* msgBuffer = new char[msgSize];
         msg->serialize(msgBuffer);
         asio::write(session->getSocket(),

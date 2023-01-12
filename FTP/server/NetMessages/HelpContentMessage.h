@@ -8,13 +8,15 @@
 class HelpContentMessage : public _BNetMsg
 {
 protected:
-    std::string m_helpContent;
+    std::string m_helpContent = "......... Content of Help ........";
     // ISerializable interface
     typedef uint16_t _helpContentSize_T;
 public:
     HelpContentMessage()
-        :_BNetMsg(NetMessageType::HELP_CONTENT, m_helpContent.size())
-    {}
+        :_BNetMsg()
+    {
+        m_header = _Header(NetMessageType::HELP_CONTENT, calculateNeededSizeForThis() - _Header::getHeaderSize());
+    }
 public:
     void deserialize(char *buffer) override
     {
