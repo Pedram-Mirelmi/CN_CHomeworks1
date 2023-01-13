@@ -14,6 +14,7 @@ using std::make_shared;
 
 template<typename MsgType>
 class AbstractNetIOManager : public IService,
+                             public INetWriter<MsgType>,
                              public std::enable_shared_from_this<AbstractNetIOManager<MsgType>>
 {
     using socket = asio::ip::tcp::socket;
@@ -23,7 +24,6 @@ protected:
     asio::io_context m_ioContext;
     socket m_socket;
     end_point m_endPoints;
-
     std::thread m_asioThread;
 
     bool m_isConnected = false;
@@ -59,9 +59,11 @@ protected:
 
     virtual void onAsyncConnected(std::error_code ec, asio::ip::tcp::endpoint endPoint)
     {
+
         if(!ec)
         {
             // std::cout << "Connected to " << endPoint << std::endl;
+            onConnected();
             m_isConnected = true;
             asio::async_read(m_socket,
                              asio::buffer(m_headerInBuffer.data(), NetMessageHeader<MsgType>::getHeaderSize()),
@@ -145,6 +147,22 @@ protected:
     };
 
 protected:
+
+    virtual void writeMessage(shared_ptr<NetMessage<MsgType>> msg) override
+    {
+        uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
+        char* msgBuffer = new char[msgSize];
+        msg->serialize(msgBuffer);
+        asio::async_write(m_socket,
+                          asio::buffer(msgBuffer, msgSize),
+                          std::bind(&AbstractNetIOManager::onAsyncWrite,
+                          this,
+                          std::placeholders::_1,
+                          std::placeholders::_2,
+                          msgBuffer)
+                          );
+    }
+
     virtual void writeSyncMessage(shared_ptr<NetMessage<MsgType>> msg)
     {
         uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
@@ -168,13 +186,18 @@ public:
     virtual void connectToServer()
     {
         std::cout << "[INFO] Connecting to server ...\n";
-        asio::connect(m_socket,
-                        m_endPoints);
-        onConnected();
+        asio::async_connect(m_socket,
+                            m_endPoints,
+                            std::bind(&AbstractNetIOManager::onAsyncConnected,
+                                        this,
+                                        std::placeholders::_1,
+                                        std::placeholders::_2)
+                            );
     }
 
     virtual void start() override
     {
+
         connectToServer();
 
         m_asioThread = std::thread([=, this](){m_ioContext.run();});
@@ -186,6 +209,10 @@ public:
         m_ioContext.stop();
         if(m_asioThread.joinable())
             m_asioThread.join();
+    }
+
+    bool is_connected() {
+        return this->m_isConnected;
     }
 
 };

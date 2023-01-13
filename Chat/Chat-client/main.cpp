@@ -1,24 +1,22 @@
 #include <iostream>
 #include <thread>
+#include <unistd.h>
 #include <chrono>
 #include "NetworkHandler.hpp"
+
 
 using namespace std;
 
 void run(string& host, int port, string& username) {
 
-    NetworkHandler net_handler(host, port, username);
-    try {
-        net_handler.start();
-    }
-    catch(...) {
-        cout << "[ERROR] Server Not available. Try later\n";
-        return;
-    }
 
-    cout << "------------------------------\n\n";
-    cout << "Hello \"" << username << "\"\n";
-    for(;;) {
+    NetworkHandler net_handler(host, port, username);
+
+    net_handler.start();
+    net_handler.wait_to_ready();
+
+
+    for(;;) {            
         string line;
         cout << ">> ";
         getline(cin, line);
@@ -26,7 +24,8 @@ void run(string& host, int port, string& username) {
         string command;
         ss >> command;
         if (command == "list") {
-            net_handler.get_user_list();
+            net_handler.update_user_list();
+            net_handler.print_user_list();
         }
         else if (command == "send") {
             string reciever;
@@ -48,6 +47,7 @@ void run(string& host, int port, string& username) {
 
 
 int main(int argc, char* argv[]) {
+
 
     if (argc != 3)
         cerr << "[ERROR] Wrong command expected argument: [Host:port] [User Name]\n";
