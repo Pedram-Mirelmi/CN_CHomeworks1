@@ -7,30 +7,14 @@ using namespace std;
 
 void run(string& host, int port, string& username) {
 
-    NetworkHandler net_handler(host, port);
-    cout << "[INFO] Connecting to server ...\n";
+    NetworkHandler net_handler(host, port, username);
     try {
         net_handler.start();
-
     }
     catch(...) {
         cout << "[ERROR] Server Not available. Try later\n";
         return;
     }
-
-
-    // Wait for server to response
-    // cout << "[INFO] Connected to " << host << " on port " << port << "\n";
-    // for (int i=0; i<11; i++) {
-    //     cout << "[INFO] Waiting for server to ACCEPT you ...\n";
-    //     if (net_handler.does_server_accept())
-    //         break;
-    //     else if(i == 10){
-    //         cerr << "[INFO] Server do not ACCEPT try again later\n";
-    //         return;
-    //     }
-    //     std::this_thread::sleep_for(std::chrono::seconds(2));   
-    // }
 
     cout << "------------------------------\n\n";
     cout << "Hello \"" << username << "\"\n";
@@ -42,12 +26,18 @@ void run(string& host, int port, string& username) {
         string command;
         ss >> command;
         if (command == "list") {
-
+            net_handler.get_user_list();
         }
         else if (command == "send") {
+            string reciever;
+            string message;
+            ss >> reciever;
+            ss >>  message;
+            net_handler.send_message(reciever, message);
 
         }
         else if (command == "exit") {
+            cout << "Exiting ...\n";
             return;
         }
         else {

@@ -43,6 +43,10 @@ public:
     {
         return MessageTypes::INFOREPLY;
     }
+
+    std::string get_user_name() {
+        return this->m_username;
+    }
 };
 
 
