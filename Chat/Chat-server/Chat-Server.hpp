@@ -93,9 +93,9 @@ public:
     inline void handleListMessage( _Sesstion_ptr session)
     {
         std::vector<_UserId_T> users;
-        users.reserve(m_onlineUsers.size());
-        for (auto& pair : m_onlineUsers)
-            users.push_back(pair.first);
+        users.reserve(m_usersIds.size());
+        for (auto& pair : m_usersIds)
+            users.push_back(pair.second);
 
         shared_ptr<ListReplyMessage> response = make_shared<ListReplyMessage>(std::move(users));
         m_netIOManager->writeMessage(std::move(response), std::move(session));
@@ -143,6 +143,7 @@ public:
             m_netIOManager->writeMessage(messages.front(), session);
             messages.pop();
         }
+        m_netIOManager->writeMessage(make_shared<ReceiveReplyMessage>(0, ""), session);
     }
 
 
