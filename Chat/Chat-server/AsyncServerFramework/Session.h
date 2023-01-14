@@ -63,7 +63,7 @@ public:
         return m_socket;
     }
 
-    std::vector<char> getMessageInBuffer() {
+    std::vector<char>& getMessageInBuffer() {
         return m_messageInBuffer;
     }
 

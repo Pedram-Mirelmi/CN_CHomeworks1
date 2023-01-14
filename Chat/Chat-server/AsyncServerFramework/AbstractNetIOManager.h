@@ -149,14 +149,8 @@ public:
         uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
         char* msgBuffer = new char[msgSize];
         msg->serialize(msgBuffer);
-        asio::async_write(session->getSocket(),
-                          asio::buffer(msgBuffer, msgSize),
-                          std::bind(&AbstractNetIOManager::onAsyncWrite,
-                          this,
-                          std::placeholders::_1,
-                          std::placeholders::_2,
-                          msgBuffer)
-                          );
+        asio::write(session->getSocket(),
+                    asio::buffer(msgBuffer, msgSize));
     }
 
     // IService interface
