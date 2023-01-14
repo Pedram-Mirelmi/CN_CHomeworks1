@@ -72,15 +72,31 @@ protected:
         if(!ec)
         {
             session->deserializeHeader();
-            asio::async_read(session->getSocket(),
-                             asio::buffer(session->getMessageInBuffer().data() + NetMessageHeader<MsgType>::getHeaderSize(),
-                                          session->getTempHeader().getBodySize()),
-                             std::bind(&AbstractNetIOManager::onAsyncReadBody,
-                                       this,
-                                       std::placeholders::_1,
-                                       std::placeholders::_2,
-                                       session)
-                             );
+            if(session->getTempHeader().getBodySize())
+            {
+                asio::async_read(session->getSocket(),
+                                 asio::buffer(session->getMessageInBuffer().data() + NetMessageHeader<MsgType>::getHeaderSize(),
+                                              session->getTempHeader().getBodySize()),
+                                 std::bind(&AbstractNetIOManager::onAsyncReadBody,
+                                           this,
+                                           std::placeholders::_1,
+                                           std::placeholders::_2,
+                                           session)
+                                 );
+            }
+            else
+            {
+                onNewMessageReadCompletely(session);
+                asio::async_read(session->getSocket(),
+                                 asio::buffer(session->getMessageInBuffer().data(),
+                                              NetMessageHeader<MsgType>::getHeaderSize()),
+                                 std::bind(&AbstractNetIOManager::onAsyncReadHeader,
+                                           this,
+                                           std::placeholders::_1,
+                                           std::placeholders::_2,
+                                           session)
+                                 );
+            }
         }
         else
         {

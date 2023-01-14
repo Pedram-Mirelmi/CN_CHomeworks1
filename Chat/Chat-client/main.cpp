@@ -15,7 +15,9 @@ void run(string& host, int port, string& username) {
     net_handler.start();
     net_handler.wait_to_connect();
     net_handler.wait_to_acknowledge();
-    net_handler.receive_all_message();
+    net_handler.update_user_list();
+
+    // net_handler.receive_all_message();
 
     
     for(;;) {            
@@ -28,7 +30,6 @@ void run(string& host, int port, string& username) {
 
         if (command == "list") {
             net_handler.update_user_list();
-            
         }
         else if (command == "send") {
             string reciever;

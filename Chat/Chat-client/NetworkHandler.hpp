@@ -65,6 +65,10 @@ protected:
                     uint16_t next_id = this->user_names.size() ;
                     get_info(this->user_ids[next_id]);
                 }
+                else
+                {
+                    receive_all_message();
+                }
                 break;
             }
             case MessageTypes::SENDREPLY:

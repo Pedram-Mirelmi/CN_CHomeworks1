@@ -9,7 +9,7 @@ class ConnAckMessage : public _BNetMsg
     // ISerializable interface
 public:
     ConnAckMessage()
-        : _BNetMsg(MessageTypes::CONNACK, calculateNeededSizeForThis())
+        : _BNetMsg(MessageTypes::CONNACK, calculateNeededSizeForThis() - _Header::getHeaderSize())
     {
 
     }

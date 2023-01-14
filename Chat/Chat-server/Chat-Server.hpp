@@ -81,6 +81,10 @@ public:
                 m_usersNames[session->getId()] = req ->getName();
                 m_usersIds[req ->getName()] = session->getId();
             }
+            else
+            {
+                session->setId(m_usersIds[req->getName()]);
+            }
         }
         {
             std::scoped_lock<std::mutex> lock(m_onlineUsersLock);
@@ -138,6 +142,7 @@ public:
     {
         std::scoped_lock<std::mutex> scopedLock(m_dataLock);
         auto messages = m_usersPendingMessages[session->getId()];
+        m_usersPendingMessages.erase(session->getId());
         while (!messages.empty())
         {
             m_netIOManager->writeMessage(messages.front(), session);

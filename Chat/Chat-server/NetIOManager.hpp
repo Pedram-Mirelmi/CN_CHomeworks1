@@ -41,6 +41,7 @@ protected:
         // TODO log the closure
         std::cout << "Connection closed: " << session->getSocket().remote_endpoint()
                   << "\terror: "<< ec.message() << std::endl;
+        m_processer->onClientDisconnected(session);
     }
     void onNewMessageReadCompletely(shared_ptr<Session<MessageTypes>> session) override
     {
