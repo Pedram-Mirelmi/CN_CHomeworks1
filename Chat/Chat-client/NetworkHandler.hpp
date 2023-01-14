@@ -27,10 +27,7 @@ private:
     vector<uint16_t> user_ids;
     vector<std::string> user_names;
     bool server_acknowledged = false;
-    bool last_message_read = false;
-    bool next_message_read = false;
-    bool last_username_fetched = true;
-    bool get_user_ids = false;
+
 
     shared_ptr<IResponseResolver> m_responseResolver;
 protected:
@@ -49,12 +46,9 @@ protected:
             {
                 ReceiveReplyMessage message;
                 message.deserialize(m_messageInBuff.data());
-                if(message.getSenderId() == 0)
-                    this->last_message_read = true;
-                else
-                    show_receive_message(message);
 
-                this->next_message_read = true;
+                if(message.getSenderId() != 0)
+                    show_receive_message(message);
                 break;
             }
             case MessageTypes::INFOREPLY:
@@ -62,8 +56,12 @@ protected:
                 UserInfoReplyMessage message;
                 message.deserialize(m_messageInBuff.data());
                 this->user_names.push_back(message.get_user_name());
-                if (this->user_name.size() == this->user_ids.size())
-                    this->last_username_fetched = true;
+                std::cout << "   - " << message.get_user_name() << "\n";
+
+                if(this->user_names.size() < this->user_ids.size()) {
+                    uint16_t next_id = this->user_names.size() ;
+                    get_info(this->user_ids[next_id]);
+                }
                 break;
             }
             case MessageTypes::SENDREPLY:
@@ -76,7 +74,8 @@ protected:
                 message.deserialize(m_messageInBuff.data());
                 this->user_ids.clear();
                 this->user_ids = message.getUsers();
-                this->get_user_ids = true;
+                if (this->user_ids.size() != 0)
+                    get_info(this->user_ids[0]);
                 break;
             }
             default:
@@ -114,51 +113,21 @@ public:
             std::this_thread::sleep_for(500ms);
     }
 
-    void wait_to_read_all_messages() {
-        while(this->last_message_read == false)
-            std::this_thread::sleep_for(500ms);
-    }
-
-    void wait_to_fetch_usernames() {
-        while(this->last_username_fetched = false)
-            std::this_thread::sleep_for(500ms);
-    }
-
 
     void receive_all_message() {
         ReceiveMessage* rec_mess = new ReceiveMessage();
         shared_ptr<_BNetMsg> rec_msg(static_cast<_BNetMsg*>(rec_mess));
-
-        this->last_message_read = false;
-
-        std::string sender_name;
-        while(this->last_message_read == false){
-            this->next_message_read = false;
-            writeMessage(rec_msg);
-            while(this->next_message_read == false)
-                std::this_thread::sleep_for(500ms);
-        }
+        writeMessage(rec_msg);
     }
 
     void update_user_list() {
         ListMessage* list_msg = new ListMessage();
         shared_ptr<_BNetMsg> msg(static_cast<_BNetMsg*>(list_msg));
 
-        this->last_username_fetched = false;
-        this->get_user_ids = false;
         this->user_names.clear();
         this->user_ids.clear();
         writeMessage(msg);
 
-        while(this->get_user_ids == false)
-            std::this_thread::sleep_for(500ms);
-
-        for (uint16_t id : this->user_ids) {
-            get_info(id);
-        }
-
-        while(this->last_username_fetched = false)
-            std::this_thread::sleep_for(500ms);
     }
 
     void get_info(uint16_t id) {
