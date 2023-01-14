@@ -13,9 +13,11 @@ void run(string& host, int port, string& username) {
     NetworkHandler net_handler(host, port, username);
 
     net_handler.start();
-    net_handler.wait_to_ready();
+    net_handler.wait_to_connect();
+    net_handler.wait_to_acknowledge();
+    net_handler.receive_all_message();
 
-
+    
     for(;;) {            
         string line;
         cout << ">> ";
@@ -23,9 +25,11 @@ void run(string& host, int port, string& username) {
         stringstream ss(line);
         string command;
         ss >> command;
+
         if (command == "list") {
             net_handler.update_user_list();
             net_handler.print_user_list();
+            
         }
         else if (command == "send") {
             string reciever;

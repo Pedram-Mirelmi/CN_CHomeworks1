@@ -62,7 +62,6 @@ protected:
 
         if(!ec)
         {
-            // std::cout << "Connected to " << endPoint << std::endl;
             onConnected();
             m_isConnected = true;
             asio::async_read(m_socket,
@@ -72,9 +71,11 @@ protected:
                                        std::placeholders::_1,
                                        std::placeholders::_2)
                              );
-
-
-
+        }
+        else {
+            std::cout << "[ERROR]  " << ec.message() << " trying again\n";
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            connectToServer();
         }
     }
 
@@ -153,14 +154,8 @@ protected:
         uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
         char* msgBuffer = new char[msgSize];
         msg->serialize(msgBuffer);
-        asio::async_write(m_socket,
-                          asio::buffer(msgBuffer, msgSize),
-                          std::bind(&AbstractNetIOManager::onAsyncWrite,
-                          this,
-                          std::placeholders::_1,
-                          std::placeholders::_2,
-                          msgBuffer)
-                          );
+        asio::write(m_socket,
+                    asio::buffer(msgBuffer, msgSize));
     }
 
     virtual void writeSyncMessage(shared_ptr<NetMessage<MsgType>> msg)
@@ -185,7 +180,6 @@ protected:
 public:
     virtual void connectToServer()
     {
-        std::cout << "[INFO] Connecting to server ...\n";
         asio::async_connect(m_socket,
                             m_endPoints,
                             std::bind(&AbstractNetIOManager::onAsyncConnected,
@@ -197,11 +191,9 @@ public:
 
     virtual void start() override
     {
-
+        std::cout << "[INFO] Connecting to server ...\n";
         connectToServer();
-
         m_asioThread = std::thread([=, this](){m_ioContext.run();});
-
     }
     virtual void stop() override
     {
