@@ -144,7 +144,7 @@ public:
 
     void send_message(std::string& receiver_name, std::string& message) {
         uint16_t id = get_id_by_name(receiver_name);
-        if (id == -1) {
+        if (id == 1000) {
             std::cout << "[ERROR] User does not exists you can update the user list by 'list' command\n";
             return;
         }
@@ -179,7 +179,7 @@ private:
             if (this->user_names[i] == user_name)
                 return this->user_ids[i];
 
-        return -1;   //not exist
+        return 1000;   //not exist
     }
     
 
