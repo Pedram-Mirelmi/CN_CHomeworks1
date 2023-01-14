@@ -10,7 +10,11 @@ class ReceiveMessage : public _BNetMsg
 
     // ISerializable interface
 public:
-    ReceiveMessage() = default;
+    ReceiveMessage()
+        :_BNetMsg(MessageTypes::RECEIVE, calculateNeededSizeForThis())
+    {
+
+    };
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);

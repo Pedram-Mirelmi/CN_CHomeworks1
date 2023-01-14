@@ -8,7 +8,11 @@ class ConnAckMessage : public _BNetMsg
 {
     // ISerializable interface
 public:
-    ConnAckMessage() = default;
+    ConnAckMessage()
+        : _BNetMsg(MessageTypes::CONNACK, calculateNeededSizeForThis())
+    {
+
+    }
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);
