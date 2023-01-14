@@ -28,7 +28,7 @@ void run(string& host, int port, string& username) {
 
         if (command == "list") {
             net_handler.update_user_list();
-            net_handler.print_user_list();
+            // net_handler.print_user_list();
             
         }
         else if (command == "send") {

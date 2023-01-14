@@ -27,6 +27,8 @@ public:
         m_header.deserialize(buffer);
         buffer += _Header::getHeaderSize();
 
+        m_users.resize(m_header.getBodySize()/2);
+
         ISerializable::deserializeByteArray(buffer,
                                             (char*)m_users.data(),
                                             m_users.size() * sizeof(_UserId_T),

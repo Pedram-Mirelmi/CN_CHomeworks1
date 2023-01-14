@@ -28,7 +28,7 @@ protected:
 
     bool m_isConnected = false;
 
-    std::vector<char> m_headerInBuffer, m_messageInBuff;
+    std::vector<char> m_messageInBuff;
     NetMessageHeader<MsgType> m_tempHeader;
 
 public:
@@ -37,7 +37,7 @@ public:
           std::enable_shared_from_this<AbstractNetIOManager>(),
           m_socket(m_ioContext)
     {
-        m_headerInBuffer.resize(NetMessageHeader<MsgType>::getHeaderSize());
+        m_messageInBuff.resize(NetMessageHeader<MsgType>::getHeaderSize());
         asio::ip::tcp::resolver resolver(m_ioContext);
         m_endPoints = resolver.resolve(ip, std::to_string(port));
     }
@@ -49,7 +49,7 @@ protected:
 
     void asyncRead() {
         asio::async_read(m_socket,
-                             asio::buffer(m_headerInBuffer.data(), NetMessageHeader<MsgType>::getHeaderSize()),
+                             asio::buffer(m_messageInBuff.data(), NetMessageHeader<MsgType>::getHeaderSize()),
                              std::bind(&AbstractNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
@@ -65,7 +65,7 @@ protected:
             onConnected();
             m_isConnected = true;
             asio::async_read(m_socket,
-                             asio::buffer(m_headerInBuffer.data(), NetMessageHeader<MsgType>::getHeaderSize()),
+                             asio::buffer(m_messageInBuff.data(), NetMessageHeader<MsgType>::getHeaderSize()),
                              std::bind(&AbstractNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
@@ -105,8 +105,9 @@ protected:
         if(!ec)
         {
             onNewMessageReadCompletely();
+            m_messageInBuff.resize(NetMessageHeader<MsgType>::getHeaderSize());
             asio::async_read(m_socket,
-                             asio::buffer(m_headerInBuffer, NetMessageHeader<MsgType>::getHeaderSize()),
+                             asio::buffer(m_messageInBuff.data(), NetMessageHeader<MsgType>::getHeaderSize()),
                              std::bind(&AbstractNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
@@ -135,7 +136,7 @@ protected:
 
     void deserializeHeader()
     {
-        m_tempHeader.deserialize(m_headerInBuffer.data());
+        m_tempHeader.deserialize(m_messageInBuff.data());
     }
 
     virtual void onNewMessageReadCompletely() = 0;
@@ -151,7 +152,7 @@ protected:
 
     virtual void writeMessage(shared_ptr<NetMessage<MsgType>> msg) override
     {
-        uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
+        uint32_t msgSize = msg->calculateNeededSizeForThis();
         char* msgBuffer = new char[msgSize];
         msg->serialize(msgBuffer);
         asio::write(m_socket, asio::buffer(msgBuffer, msgSize));
@@ -159,7 +160,7 @@ protected:
 
     virtual void writeSyncMessage(shared_ptr<NetMessage<MsgType>> msg)
     {
-        uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
+        uint32_t msgSize = msg->calculateNeededSizeForThis();
         char* msgBuffer = new char[msgSize];
         msg->serialize(msgBuffer);
         asio::write(m_socket, asio::buffer(msgBuffer, msgSize));
@@ -167,7 +168,7 @@ protected:
 
     virtual void readSyncMessage() {
         asio::read(m_socket,
-                    asio::buffer(m_headerInBuffer,
+                    asio::buffer(m_messageInBuff.data(),
                                 NetMessageHeader<MsgType>::getHeaderSize()));
         deserializeHeader();
         asio::read(m_socket,
