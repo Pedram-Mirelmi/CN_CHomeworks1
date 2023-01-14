@@ -11,7 +11,7 @@ class ListMessage : public _BNetMsg
     // ISerializable interface
 public:
     ListMessage()
-        : _BNetMsg(MessageTypes::LIST, calculateNeededSizeForThis())
+        : _BNetMsg(MessageTypes::LIST, calculateNeededSizeForThis() - _Header::getHeaderSize())
     {
 
     }

@@ -131,6 +131,7 @@ public:
 
         this->user_names.clear();
         this->user_ids.clear();
+        cout << "send list message\n";
         writeMessage(msg);
 
     }

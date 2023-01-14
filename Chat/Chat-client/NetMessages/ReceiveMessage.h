@@ -11,7 +11,7 @@ class ReceiveMessage : public _BNetMsg
     // ISerializable interface
 public:
     ReceiveMessage()
-        :_BNetMsg(MessageTypes::RECEIVE, calculateNeededSizeForThis())
+        :_BNetMsg(MessageTypes::RECEIVE, calculateNeededSizeForThis() - _Header::getHeaderSize())
     {
 
     };
