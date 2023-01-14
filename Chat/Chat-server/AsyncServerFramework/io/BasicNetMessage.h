@@ -27,14 +27,14 @@ public:
     // ISerializable interface
     virtual void deserialize(char *buffer) override
     {
-        // like a struct
-        *this = *((NetMessageHeader<MsgType>*)buffer);
+        ISerializable::deserializePrimitiveType<MsgType>(buffer, m_messageType);
+        ISerializable::deserializePrimitiveType<uint32_t>(buffer, m_messageBodySize, false);
     }
 
     virtual void serialize(char *buffer) const override
     {
-        // like a struct
-        *((NetMessageHeader<MsgType>*)buffer) = *this;
+        ISerializable::serializePrimitiiveType<MsgType>(buffer, m_messageType);
+        ISerializable::serializePrimitiiveType<uint32_t>(buffer, m_messageBodySize, false);
     }
 
     virtual uint32_t calculateNeededSizeForThis() const override

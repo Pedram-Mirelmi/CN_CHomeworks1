@@ -3,7 +3,7 @@
 #include "AsyncServerFramework/io/BasicNetMessage.h"
 #include "AsyncServerFramework/io/INetMessageDeserializer.h"
 #include "AsyncServerFramework/Session.h"
-#include "INetMessageProcessor.hpp"
+#include "IMainManager.hpp"
 #include "./AsyncServerFramework/AbstractNetIOManager.h"
 
 typedef NetMessage<MessageTypes> _BNetMsg;

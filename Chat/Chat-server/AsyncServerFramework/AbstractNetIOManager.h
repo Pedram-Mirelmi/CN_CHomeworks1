@@ -49,7 +49,8 @@ protected:
             shared_ptr<Session<MsgType>> newConnection = make_shared<Session<MsgType>>(std::move(socket));
             onNewConnectionAccepted(newConnection);
             asio::async_read(newConnection->getSocket(),
-                             asio::buffer(newConnection->getHeaderInBuffer(), NetMessageHeader<MsgType>::getHeaderSize()),
+                             asio::buffer(newConnection->getMessageInBuffer().data(),
+                                          NetMessageHeader<MsgType>::getHeaderSize()),
                              std::bind(&AbstractNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,
@@ -72,7 +73,8 @@ protected:
         {
             session->deserializeHeader();
             asio::async_read(session->getSocket(),
-                             asio::buffer(session->getBodyInBuffer(), session->getTempHeader().getBodySize()),
+                             asio::buffer(session->getMessageInBuffer().data() + NetMessageHeader<MsgType>::getHeaderSize(),
+                                          session->getTempHeader().getBodySize()),
                              std::bind(&AbstractNetIOManager::onAsyncReadBody,
                                        this,
                                        std::placeholders::_1,
@@ -100,7 +102,7 @@ protected:
             onNewMessageReadCompletely(session);
             session->resetBuffers();
             asio::async_read(session->getSocket(),
-                             asio::buffer(session->getHeaderInBuffer(), NetMessageHeader<MsgType>::getHeaderSize()),
+                             asio::buffer(session->getMessageInBuffer().data(), NetMessageHeader<MsgType>::getHeaderSize()),
                              std::bind(&AbstractNetIOManager::onAsyncReadHeader,
                                        this,
                                        std::placeholders::_1,

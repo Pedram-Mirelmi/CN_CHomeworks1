@@ -17,16 +17,7 @@ class Session : public std::enable_shared_from_this<Session<MsgType>>
     socket m_socket;
     uint64_t m_id;
 
-    /*
-     *   In a normal state:
-     *
-     *   message data:  [##########################################################]
-     *                   ^                      ^
-     *    m_messageBuffer=m_headerBuffer  m_bodyInBuffer
-     */
-    char* m_messageBuffer = nullptr;
-    char* m_headerInBuffer = nullptr;
-    char* m_bodyInBuffer = nullptr;
+    std::vector<char> m_messageInBuffer;
 
     NetMessageHeader<MsgType> m_tempHeader;
 public:
@@ -34,8 +25,7 @@ public:
     Session(socket&& socket)
         :m_socket(std::move(socket))
     {
-        // first we allocate as mush as a header
-        m_messageBuffer = m_headerInBuffer = new char[NetMessageHeader<MsgType>::getHeaderSize()];
+        m_messageInBuffer.resize(NetMessageHeader<MsgType>::getHeaderSize());
         m_id = 0;
     }
 
@@ -46,28 +36,16 @@ public:
     {
         // TODO log that the session is closing
         m_socket.close();
-        delete [] m_messageBuffer;
     }
 
     virtual void deserializeHeader()
     {
         // deserialize just header
-        m_tempHeader.deserialize(m_headerInBuffer);
-        m_messageBuffer = new char[NetMessageHeader<MsgType>::getHeaderSize()
-                                   + m_tempHeader.getBodySize()];
+        m_tempHeader.deserialize(m_messageInBuffer.data());
 
-        memcpy(m_messageBuffer, m_headerInBuffer, NetMessageHeader<MsgType>::getHeaderSize());
-        delete [] m_headerInBuffer; // delete old header buffer
-        m_headerInBuffer = m_messageBuffer;
-
-        m_bodyInBuffer = m_messageBuffer + NetMessageHeader<MsgType>::getHeaderSize();
+        m_messageInBuffer.resize(m_tempHeader.getBodySize() + NetMessageHeader<MsgType>::getHeaderSize());
     }
 
-    virtual void resetBuffers()
-    {
-        delete [] m_messageBuffer;
-        m_messageBuffer = m_headerInBuffer = new char[NetMessageHeader<MsgType>::getHeaderSize()];
-    }
 
 public:
     inline uint64_t getId() const
@@ -84,22 +62,19 @@ public:
     {
         return m_socket;
     }
-    char *getHeaderInBuffer()
-    {
-        return m_headerInBuffer;
-    }
-    char *getBodyInBuffer()
-    {
-        return m_bodyInBuffer;
-    }
-    char *getMessageInBuffer()
-    {
-        return m_messageBuffer;;
+
+    std::vector<char> getMessageInBuffer() {
+        return m_messageInBuffer;
     }
 
     const NetMessageHeader<MsgType> &getTempHeader()
     {
         return m_tempHeader;
+    }
+
+    void resetBuffers()
+    {
+        m_messageInBuffer.resize(NetMessageHeader<MsgType>::getHeaderSize());
     }
 
 };

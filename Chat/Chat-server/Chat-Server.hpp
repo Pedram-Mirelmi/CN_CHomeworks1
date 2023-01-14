@@ -4,7 +4,7 @@
 #include <mutex>
 #include "./NetIOManager.hpp"
 
-class ChatServer : IMainManager
+class ChatServer : public IMainManager, public IService
 {
     _NetIOManager_ptr m_netIOManager;
 
@@ -150,6 +150,17 @@ public:
     void setNetIOManager(const _NetIOManager_ptr &newNetIOManager)
     {
         m_netIOManager = newNetIOManager;
+    }
+
+    // IService interface
+public:
+    void start() override
+    {
+        m_netIOManager->start();
+    }
+    void stop() override
+    {
+        m_netIOManager->start();
     }
 };
 

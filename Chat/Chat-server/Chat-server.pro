@@ -19,7 +19,7 @@ HEADERS += \
     AsyncServerFramework/io/ISerializable.h \
     Chat-Server.hpp \
     ChatServer-typedefs.hpp \
-    INetMessageProcessor.hpp \
+    IMainManager.hpp \
     MessageBodyDeserializer.hpp \
     NetIOManager.hpp \
     NetMessages/AllNetMessages.hpp \

@@ -21,23 +21,31 @@ public:
         m_deserializer = newDeserializer;
     }
 
-    void setProcesser(const _MM_ptr &newProcesser)
+    void setMainManager(const _MM_ptr &newProcesser)
     {
         m_processer = newProcesser;
     }
 
+    void addThisThread()
+    {
+        m_ioContext.run(); // add this thread to the threads that do io stuff
+    }
 protected:
     void onNewConnectionAccepted(shared_ptr<Session<MessageTypes>> newConnection) override
     {
         // TODO log the new connection
+        std::cout << "new connection established: " << newConnection->getSocket().remote_endpoint() << std::endl;
     }
     void onConnectionClosedByClient(std::error_code ec, shared_ptr<Session<MessageTypes>> session) override
     {
         // TODO log the closure
+        std::cout << "Connection closed: " << session->getSocket().remote_endpoint()
+                  << "\terror: "<< ec.message() << std::endl;
     }
     void onNewMessageReadCompletely(shared_ptr<Session<MessageTypes>> session) override
     {
-        auto msg = m_deserializer->deserializeMessage(session->getTempHeader(), session->getMessageInBuffer());
+        auto msg = m_deserializer->deserializeMessage(session->getTempHeader(), session->getMessageInBuffer().data());
         m_processer->processNetMessage(msg, session);
     }
+
 };
