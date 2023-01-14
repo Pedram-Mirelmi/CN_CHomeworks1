@@ -154,8 +154,7 @@ protected:
         uint32_t msgSize = msg->getHeader().getBodySize() + msg->getHeader().calculateNeededSizeForThis();
         char* msgBuffer = new char[msgSize];
         msg->serialize(msgBuffer);
-        asio::write(m_socket,
-                    asio::buffer(msgBuffer, msgSize));
+        asio::write(m_socket, asio::buffer(msgBuffer, msgSize));
     }
 
     virtual void writeSyncMessage(shared_ptr<NetMessage<MsgType>> msg)

@@ -81,7 +81,7 @@ protected:
             }
             default:
             {
-                std::cout << "[ERROR] Message not supported\n";
+                std::cout << "[ERROR] Server send a message that not supported\n";
             }
         }
     }
