@@ -10,7 +10,11 @@ class ListMessage : public _BNetMsg
 
     // ISerializable interface
 public:
-    ListMessage() = default;
+    ListMessage()
+        : _BNetMsg(MessageTypes::LIST, calculateNeededSizeForThis())
+    {
+
+    }
     void deserialize(char *buffer) override
     {
         m_header.deserialize(buffer);
