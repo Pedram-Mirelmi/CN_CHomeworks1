@@ -28,14 +28,14 @@ void run(string& host, int port, string& username) {
 
         if (command == "list") {
             net_handler.update_user_list();
-            // net_handler.print_user_list();
             
         }
         else if (command == "send") {
             string reciever;
-            string message;
+            char mess_char[1024];
             ss >> reciever;
-            ss >>  message;
+            ss.getline(mess_char, 1024);
+            string message(mess_char);
             net_handler.send_message(reciever, message);
 
         }

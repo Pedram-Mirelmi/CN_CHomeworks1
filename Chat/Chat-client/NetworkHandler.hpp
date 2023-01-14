@@ -131,7 +131,6 @@ public:
 
         this->user_names.clear();
         this->user_ids.clear();
-        cout << "send list message\n";
         writeMessage(msg);
 
     }
@@ -169,7 +168,10 @@ private:
 
     void show_receive_message(ReceiveReplyMessage& message) {
         std::string sender_name = get_name_by_id(message.getSenderId());
-        std::cout << "<< " << sender_name << " : " << message.getMessage() << '\n';
+        std::cout << "<< " << sender_name << " : " << message.getMessage() << "\n";
+        if (sender_name == "[UnKnown]")
+            std::cout << "[ERROR] You can fetch all names by 'list' command\n";
+        
     }
 
     std::string get_name_by_id(int id) {
@@ -177,7 +179,7 @@ private:
             if (this->user_ids[i] == id)
                 return this->user_names[i];
 
-        return "";   //not exist
+        return "[UnKnown]";   //not exist
     }
 
     uint16_t get_id_by_name(std::string& user_name) {
