@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-    HTTPServer server = HTTPServer("127.0.0.1", 16000, 8);
+    HTTPServer server = HTTPServer("127.0.0.1", 16000, 1);
     server.start();
     return 0;
 }

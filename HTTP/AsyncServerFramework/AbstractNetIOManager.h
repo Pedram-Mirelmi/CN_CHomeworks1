@@ -143,9 +143,13 @@ public:
     {
         std::stringstream stream;
         msg->serialize(stream);
-        asio::write(session->getSocket(),
-                          asio::buffer(stream.view())
-                          );
+        try {
+            asio::write(session->getSocket(),
+                        asio::buffer(stream.view())
+                        );
+        }  catch (std::exception e) {
+            std::cout << e.what() << std::endl;
+        }
     }
 
     // IService interface
