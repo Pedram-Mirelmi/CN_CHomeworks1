@@ -39,11 +39,13 @@ protected:
         {
             case MessageTypes::CONNACK:
             {
+                // std::cout << "CONNACK \n";
                 this->server_acknowledged = true;
                 break;
             }
             case MessageTypes::RECEIVEREPLY:
             {
+                // std::cout << "RECEIVEREPLY \n";
                 ReceiveReplyMessage message;
                 message.deserialize(m_messageInBuff.data());
 
@@ -53,6 +55,7 @@ protected:
             }
             case MessageTypes::INFOREPLY:
             {
+                // std::cout << "INFOREPLY \n";
                 UserInfoReplyMessage message;
                 message.deserialize(m_messageInBuff.data());
                 this->user_names.push_back(message.get_user_name());
@@ -66,10 +69,12 @@ protected:
             }
             case MessageTypes::SENDREPLY:
             {
+                // std::cout << "SENDREPLY \n";
                 break;
             }
             case MessageTypes::LISTREPLY:
             {
+                // std::cout << "LISTREPLY \n";
                 ListReplyMessage message;
                 message.deserialize(m_messageInBuff.data());
                 this->user_ids.clear();
